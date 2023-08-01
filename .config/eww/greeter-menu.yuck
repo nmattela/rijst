@@ -1,0 +1,63 @@
+(defwindow greeter-menu
+    :monitor 0
+    :focusable false
+    :stacking "bg"
+    :geometry (geometry
+                    :x 0
+                    :y 0
+                    :width 1920
+                    :height 1026
+                    :anchor "center")
+    (greeter)
+)
+
+(defwidget greeter []
+    (box
+        :class "greeter-root"
+        (box
+            :class "greeter-time-box"
+            :orientation "vertical"
+            :space-evenly false
+            :halign "start"
+            :valign "start"
+            :width 400
+            :height 100
+            (box :class "greeter-day"  :halign "start" "It's Tuesday")
+            (box :class "greeter-time" :halign "center" "20:48")
+            (box :class "greeter-date" :halign "end" "2023 08 01")
+        )
+
+        (box
+            :class "greeter-profile-box"
+            :orientation "horizontal"
+            :valign "start"
+            :halign "center"
+            :space-evenly false
+            (image
+                :class "greeter-profile-picture"
+                :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
+                :image-width 64
+                :image-height 64
+            )
+            (label :class "greeter-profile-name" :halign "start" :text "Nicolas")
+        )
+        (box
+            :class "greeter-weather"
+            :orientation "vertical"
+            :space-evenly false
+            :valign "start"
+            (box
+                :orientation "horizontal"
+                :space-evenly true
+                (box
+                    :orientation "vertical"
+                    :class "greeter-weather-description"
+                    (label :halign "start" :text "It's")
+                    (label :class "greeter-weather-forecast" :halign "end" :text "Rainy")
+                )
+                (label :class "greeter-weather-emoji" :text "🌧️")
+            )
+            (label :class "greeter-weather-temperature" :text "21°C")
+        )
+    )
+)

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+active_window() {
+    ACTIVE_WINDOW=$(hyprctl activeworkspace | grep lastwindowtitle | awk '{for (i=2; i<=NF; i++) printf "%s ", $i; print ""}')
+    # ACTIVE_WINDOW=$(hyprctl activewindow | head -1 | awk '{for (i=4; i<=NF; i++) printf "%s ", $i; print ""}')
+    WITHOUT_COLON="${ACTIVE_WINDOW::-2}"
+
+    echo $ACTIVE_WINDOW
+}
+
+if [[ $1 == "--active-window" ]]; then
+    active_window
+fi

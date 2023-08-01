@@ -1,0 +1,47 @@
+(defvar power-menu-open false)
+
+(defwindow power-menu
+    :monitor 1
+    :focusable false
+    :stacking "overlay"
+    :geometry (geometry
+                    :x 0
+                    :y 0
+                    :width 0
+                    :height 0
+                    :anchor "center")
+    (power)
+)
+
+(defwidget power []
+    (revealer
+        :transition "crossfade"
+        :reveal power-menu-open
+        (eventbox
+            :onclick "./scripts/menu-reveal --toggle-power"
+            :width 1920
+            :height 1080
+            (box
+                :class "power-root"
+                :width 300
+                :height 300
+                :spacing 10
+                :orientation "vertical"
+                (box
+                    :class "power-row"
+                    :orientation "horizontal"
+                    :spacing 10
+                    (eventbox :class "power-icon power-off" :onclick "shutdown -h now" "󰐥")
+                    (eventbox :class "power-icon power-reboot"  :onclick "reboot""󰑓")
+                )
+                (box
+                    :class "power-row"
+                    :orientation "horizontal"
+                    :spacing 10
+                    (eventbox :class "power-icon power-lock" :onclick "swaylock -f -c 000000" "󰌾")
+                    (eventbox :class "power-icon power-logout" :onclick "hyprctl dispatch exit ok" "󰍃")
+                )
+            )
+        )
+    )
+)

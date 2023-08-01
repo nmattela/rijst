@@ -1,0 +1,312 @@
+
+//$bg-color: #B2A4FF;
+$bg-color: #3b4252;
+$fg-color: #4c566a;
+
+$err-color: #FAAB78;
+
+$wifi-color: #FAAB78;
+$bluetooth-color: #0083fc;
+$volume-color: #5C8984;
+$power-color: #A86464;
+$power-reboot-color: #A0C49D;
+$power-lock-color: #8294C4;
+$power-logout-color: #FFD966;
+$brightness-color: #F49D1A;
+
+$unused-workspaces: #5e81ac;
+$used-workspaces: $wifi-color;
+$active-workspaces: $bluetooth-color;
+
+$temperature-color: #ffd6a5;
+$rain-color: #90dbf4;
+
+$day-color: #fb6f92;
+$date-color: #a2d2ff;
+
+* {
+    all: unset;
+    transition: 200ms ease-out;
+}
+
+.bar-segments-no-bg {
+    background-color: rgba($bg-color, 0);
+}
+
+.bar-segments {
+    background-color: rgba($bg-color, 0.6);
+}
+
+.bar-segment {
+    // background-color: rgba($bg-color, 0.6);
+    padding: 0.5em;
+    // opacity: 0.8;
+}
+
+.top-left {
+    border-bottom-right-radius: 10px;
+
+    margin-right: 150px;
+}
+
+.top-center {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    margin: 0 200px;
+}
+
+.top-right  {
+    border-bottom-left-radius: 10px;
+
+    margin-left: 150px;
+}
+
+.system-icon {
+    font-family: Gotham;
+    background-color: $fg-color;
+    border-radius: 20px;
+    margin: 5px 5px;
+    padding: 10px;
+}
+
+.workspaces {
+    border-radius: 100px;
+    background-color: $fg-color;
+    padding: 0.5rem;
+}
+
+.workspace {
+    border-radius: 100px;
+}
+
+.workspace-active {
+    background-color: $active-workspaces;
+}
+
+.workspace-used {
+    background-color: $used-workspaces;
+}
+
+.workspace-unused {
+    background-color: $unused-workspaces;
+}
+
+.clock {
+    font-family: Ubuntu;
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.network-err {
+    color: $err-color;
+}
+
+.icons {
+    border: none;
+    border-radius: 100px;
+    background-color: $fg-color;
+    padding: 0.5rem;
+}
+
+.icon {
+    // margin: 2px 0;
+    padding: 0.2rem;
+    background: none;
+    border-radius: 100px;
+}
+
+.wifi-icon {
+    background-color: $wifi-color;
+    // border: 1px solid white;
+}
+
+.bluetooth-icon {
+    background-color: $bluetooth-color;
+}
+
+.battery-icon {
+    // border: 1px solid white;
+    // background-color: $battery-color;
+}
+
+.volume-icon {
+    background-color: $volume-color;
+}
+
+.expand-icon {
+    background-color: initial;
+}
+
+.power-button-icon {
+    // margin: 0 135px;
+    margin: 4px 10px;
+    background-color: $power-color;
+}
+
+.system-root {
+    background-color: $bg-color;
+    border-radius: 10px;
+
+    padding: 15px 10px;
+}
+
+.system-icons-row {
+    // margin: 50px 0;
+}
+
+.system-sliders {
+    margin-top: 20px;
+}
+
+.system-slider-icon {
+    font-size: 20px;
+    border-radius: 30px;
+}
+
+.system-slider {
+    margin: 0 5px;
+}
+
+.system-volume-slider-icon {
+    background-color: $volume-color;
+}
+
+.system-brightness-slider-icon {
+    background-color: $brightness-color;
+}
+
+.volume-slider trough {
+    padding: 0.5em;
+    background-color: $fg-color;
+    border-radius: 15px;
+}
+
+.volume-slider highlight {
+    padding: 0.5em;
+    background-color: $volume-color;
+    border-radius: 15px;
+}
+
+.brightness-slider trough {
+    padding: 0.5em;
+    background-color: $fg-color;
+    border-radius: 15px;
+}
+
+.brightness-slider highlight {
+    padding: 0.5em;
+    background-color: $brightness-color;
+    border-radius: 15px;
+}
+
+.power-root {
+    background-color: rgba($bg-color, 0.5);
+    border-radius: 10px;
+    margin: 22rem 50rem;
+    padding: 10px;
+}
+
+.power-icon {
+    border-radius: 10px;
+    font-size: 50px;
+}
+
+.power-icon:hover {
+    font-size: 100px;
+}
+
+.power-reboot {
+    background-color: $power-reboot-color;
+}
+
+.power-off {
+    background-color: $power-color;
+}
+
+.power-lock {
+    background-color: $power-lock-color;
+}
+
+.power-logout {
+    background-color: $power-logout-color;
+}
+
+.system-notification {
+    font-family: Gotham;
+    background-color: $fg-color;
+    border-radius: 30px;
+}
+
+.system-notification-close {
+    margin: 10px 20px 0 0;
+    padding: 2px;
+    background-color: $bg-color;
+    border-radius: 10px;
+}
+
+.system-clear-all {
+    background-color: $bg-color;
+    margin-right: 440px;
+    padding: 10px;
+}
+
+.greeter-root {
+    font-family: JetBrains Mono;
+}
+
+.greeter-time-box {
+    font-weight: bold;
+    letter-spacing: 0.2rem;
+    font-size: 6rem;
+    border-radius: 30px;
+    margin: 4rem 4rem;
+}
+
+.greeter-day {
+    color: $day-color;
+    font-size: 4rem;
+}
+
+.greeter-time {
+}
+
+.greeter-date {
+    color: $date-color;
+    font-size: 3rem;
+}
+
+.greeter-profile-box {
+    // background-color: $fg-color;
+    border-radius: 50px;
+    margin: 5rem 0;
+}
+
+.greeter-profile-picture {
+    border-radius: 50%;
+    padding: 0 1rem 0 0;
+}
+
+.greeter-profile-name {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+.greeter-weather {
+    font-weight: bold;
+    font-size: 6rem;
+
+    margin: 4rem 4rem;
+}
+
+.greeter-weather-forecast {
+    color: $rain-color;
+}
+
+.greeter-weather-emoji {
+    font-size: 10rem;
+}
+
+.greeter-weather-temperature {
+    color: $temperature-color;
+}

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+toggle_system() {
+    is_open=$(eww get system-menu-open)
+
+    if [[ $is_open == true ]]; then
+        $(eww update system-menu-open=false)
+    else
+        $(eww update system-menu-open=true)
+    fi
+}
+
+toggle_power() {
+    is_open=$(eww get power-menu-open)
+
+    if [[ $is_open == true ]]; then
+        $(eww update power-menu-open=false)
+        $(eww close power-menu)
+    else
+        $(eww open power-menu)
+        $(eww update power-menu-open=true)
+    fi
+}
+
+if [[ $1 == "--toggle-system" ]]; then
+    toggle_system
+elif [[ $1 == "--toggle-power" ]]; then
+    toggle_power
+fi

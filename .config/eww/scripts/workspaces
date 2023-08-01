@@ -1,0 +1,95 @@
+#!/bin/sh
+
+program_icon() {
+    window_title=$1
+
+    case $window_title in
+        *Firefox*)
+            echo "󰈹";;
+        *Spotify*)
+            echo "";;
+        *"Visual Studio Code"*)
+            echo "󰨞";;
+        *Element*)
+            echo "󰭹";;
+        *"Kitty"*)
+            echo "";;
+        *"Discord"*)
+            echo "󰙯";;
+        *)
+            echo ""
+    esac
+}
+
+list() {
+
+    USED_WORKSPACES_JSON=$(hyprctl workspaces -j)
+
+    readarray -t USED_WORKSPACES < <(echo $USED_WORKSPACES_JSON | jq -c '.[]')
+    readarray -t USED_WORKSPACES_IDS < <(echo $USED_WORKSPACES_JSON | jq -c '.[].id')
+
+    ACTIVE_WORKSPACE=$(hyprctl activeworkspace -j)
+    local ACTIVE_WORKSPACE_ID=$(echo "$ACTIVE_WORKSPACE" | jq .id)
+
+    declare -a WORKSPACES
+
+    for ((i=0; i < 10; i++)); do
+        index=$((i + 1))
+
+        local active=false
+        if [ "$index" -eq "$ACTIVE_WORKSPACE_ID" ];then
+            active=true
+        fi
+
+        for ((j=0; j < "${#USED_WORKSPACES_IDS[@]}"; j++)); do
+            local workspace_index="${USED_WORKSPACES_IDS[$j]}"
+            if [[ "$workspace_index" -eq "$index" ]]; then
+                local USED_WORKSPACE="${USED_WORKSPACES[$j]}"
+                local last_window_title=$(echo "$USED_WORKSPACE" | jq .lastwindowtitle)
+                local window_icon=$(program_icon "$last_window_title")
+
+                WORKSPACES[$i]="${USED_WORKSPACE::-1}"
+                WORKSPACES[$i]+=", \"used\": true, \"active\": $active, \"icon\": \"$window_icon\"}"
+
+                break
+            fi
+        done
+
+        local found="${WORKSPACES[$i]}"
+        if [[ $found == "" ]]; then
+            WORKSPACES[$i]="{\"id\": $index, \"name\": \"$index\", \"monitor\": \"\", \"windows\": 0, \"hasfullscreen\": false, \"lastwindow\": \"\", \"lastwindowtitle\": \"\", \"used\": false, \"active\": $active, \"icon\": \"\"}"
+        fi
+    done
+
+    local WORKSPACES_JSON="["
+    local first=true
+
+    for ((i=0; i < 10; i++)); do
+        item="${WORKSPACES[$i]}"
+        index=$((i + 1))
+        if [ "$first" = false ]; then
+            WORKSPACES_JSON+=", "
+        else
+            first=false
+        fi
+
+        WORKSPACES_JSON+="$item"
+    done
+    WORKSPACES_JSON+="]"
+
+    echo "$WORKSPACES_JSON"
+}
+
+active_workspace() {
+    ACTIVE_WORKSPACE=$(hyprctl activeworkspace -j)
+
+    echo $ACTIVE_WORKSPACE
+}
+
+if [[ $1 == "--list" ]]; then
+    list
+elif [[ $1 == "--program-icon" ]]; then
+    program_icon $2
+elif [[ $1 == "--active-workspace" ]]; then
+    active_workspace
+fi
