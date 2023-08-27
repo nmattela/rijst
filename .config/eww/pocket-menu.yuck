@@ -1,0 +1,176 @@
+(defvar pocket-menu-open true)
+(defvar active-player-index 0)
+
+(defwindow pocket-menu
+    :monitor 0
+    :focusable false
+    :stacking "overlay"
+    :geometry (geometry
+                    :x 0
+                    :y 15
+                    :width 0
+                    :height 0
+                    :anchor "top center")
+    (pocket)
+)
+
+(defwidget pocket-player [stati index]
+    (box
+        :class "pocket-widget pocket-player"
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(\"${stati[index].metadata.art_url}\");"
+        :orientation "vertical"
+        :space-evenly false
+        :halign "center"
+        :spacing 10
+        (box
+            :class "pocket-player-description"
+            :orientation "vertical"
+            (label :class "pocket-player-title" :limit-width 50 :halign "start" :text "${stati[index].metadata.title}")
+            (label :class "pocket-player-album" :limit-widht 50 :halign "start" :text "${stati[index].metadata.artist}")
+        )
+        (box
+            :class "pocket-player-controls"
+            :orientation "horizontal"
+            :halign "center"
+            :space-evenly false
+            :spacing 50
+            (button
+                :class "pocket-player-shuffle"
+                :onclick "${stati[index].set_shuffle} Toggle"
+                {stati[index].shuffle == "On" ? "󰒟" : "󰒞"}
+            )
+            (button
+                :class "pocket-player-prev"
+                :onclick "${stati[index].set_previous}"
+                "󰒮"
+            )
+            (button
+                :class "pocket-player-pause"
+                :onclick "${stati[index].set_play_pause}"
+                "${stati[index].status == "Playing" ? "󰏤" : "󰐊"}"
+            )
+            (button
+                :class "pocket-player-pause"
+                :onclick "${stati[index].set_next}"
+                "󰒭"
+            )
+            (button
+                :class "pocket-player-loop"
+                :onclick "${stati[index].set_loop} ${stati[index].loop == "None" ? "Track" : stati[index].loop == "Track" ? "Playlist" : "None"}"
+                "${stati[index].loop == "None" ? "󰑗" : stati[index].loop == "Track" ? "󰑘" : "󰑖"}"
+            )
+        )
+        (scale
+            :class "pocket-player-progress"
+            :orientation "horizontal"
+            :visible {stati[index].length > 0}
+            :min 0
+            :max {stati[index].length}
+            :value {stati[index].position}
+            :onchange "${stati[index].set_position} {}"
+            :width 500
+        )
+        (box
+            :orientation "horizontal"
+            (for status in stati
+                (button
+                    :class "pocket-player-selector"
+                    :onclick "${EWW_CMD} update active-player-index=${status.index}"
+                    {active-player-index == status.index ? "•" : "◦"}
+                )
+            )
+        )
+    )
+)
+
+(defwidget pocket-profile []
+    (box
+        :class "pocket-widget pocket-profile"
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(\"/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes.png\");"
+        :orientation "vertical"
+        :space-evenly true
+        (image
+            :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
+            :image-width 64
+            :image-height 64
+        )
+        (label :class "pocket-profile-name" :text "Welcome, Nicolas!")
+    )
+)
+
+(defwidget pocket-clock []
+    (box
+        :class "pocket-widget pocket-clock"
+        :orientation "vertical"
+        (label :text "${time}")
+        (label :text "${date}")
+    )
+)
+
+(defwidget pocket-weather []
+    (box
+        :class "pocket-widget pocket-weather"
+        :orientation "vertical"
+        (label :class "pocket-weather-stat" :style "color: ${weather-hex};" :halign "start" :text "${weather-stat}")
+        (label :class "pocket-weather-temp" :halign "start" :text "${weather-temp}°C")
+        (label :class "pocket-weather-icon" :style "color: ${weather-hex};" :halign "end" :text "${weather-icon}")
+    )
+)
+
+(defwidget pocket-stats-scale [class value icon]
+    (box
+        :orientation "horizontal"
+        :space-evenly false
+        :spacing 10
+        :halign "center"
+        (label :text "${icon}")
+        (label :text "${value}%")
+        (scale
+            :class "pocket-stats-scale ${class}"
+            :width 1500
+            :value value
+            :orientation "horizontal"
+        )
+    )
+)
+
+(defwidget pocket-stats []
+    (box
+        :class "pocket-widget pocket-stats"
+        :orientation "vertical"
+        (pocket-stats-scale :class "pocket-stats-cpu" :value {round(EWW_CPU.avg, 0)} :icon "")
+        (pocket-stats-scale :class "pocket-stats-memory" :value {round(EWW_RAM.used_mem_perc, 0)} :icon "󱩵")
+        (pocket-stats-scale :class "pocket-stats-disk" :value {round(EWW_DISK["/"].used_perc, 0)} :icon "󱛟")
+    )
+)
+
+(defwidget pocket []
+    (revealer
+        :transition "slidedown"
+        :reveal pocket-menu-open
+        (box
+            :class "pocket-root"
+            :orientation "vertical"
+            :space-evenly true
+            :width 800
+            :height 300
+            (box
+                :orientation "horizontal"
+                :space-evenly true
+                (box
+                    :orientation "vertical"
+                    (pocket-profile)
+                    (pocket-clock)
+                )
+                (pocket-player
+                    :stati {music-status}
+                    :index active-player-index
+                )
+                (pocket-weather)
+            )
+            (box
+                (pocket-stats)
+            )
+        )
+    )
+)

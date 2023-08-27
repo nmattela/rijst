@@ -1,0 +1,24 @@
+#!/bin/bash
+
+day() {
+    DAY_INDEX=$(date +%u)
+    if [[ $DAY_INDEX -eq 1 ]]; then
+        echo "Monday"
+    elif [[ $DAY_INDEX -eq 2 ]]; then
+        echo "Tuesday"
+    elif [[ $DAY_INDEX -eq 3 ]]; then
+        echo "Wednesday"
+    elif [[ $DAY_INDEX -eq 4 ]]; then
+        echo "Thursday"
+    elif [[ $DAY_INDEX -eq 5 ]]; then
+        echo "Friday"
+    elif [[ $DAY_INDEX -eq 6 ]]; then
+        echo "Saturday"
+    elif [[ $DAY -eq 7 ]]; then
+        echo "Sunday"
+    fi
+}
+
+if [[ $1 == "--day" ]]; then
+    day
+fi

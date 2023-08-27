@@ -14,50 +14,103 @@
 (defwidget greeter []
     (box
         :class "greeter-root"
+        :orientation "vertical"
         (box
-            :class "greeter-time-box"
-            :orientation "vertical"
-            :space-evenly false
-            :halign "start"
-            :valign "start"
-            :width 400
-            :height 100
-            (box :class "greeter-day"  :halign "start" "It's Tuesday")
-            (box :class "greeter-time" :halign "center" "20:48")
-            (box :class "greeter-date" :halign "end" "2023 08 01")
-        )
-
-        (box
-            :class "greeter-profile-box"
-            :orientation "horizontal"
-            :valign "start"
-            :halign "center"
-            :space-evenly false
-            (image
-                :class "greeter-profile-picture"
-                :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
-                :image-width 64
-                :image-height 64
-            )
-            (label :class "greeter-profile-name" :halign "start" :text "Nicolas")
-        )
-        (box
-            :class "greeter-weather"
-            :orientation "vertical"
-            :space-evenly false
+            :class "greeter-top"
+            :space-evenly true
             :valign "start"
             (box
-                :orientation "horizontal"
-                :space-evenly true
-                (box
-                    :orientation "vertical"
-                    :class "greeter-weather-description"
-                    (label :halign "start" :text "It's")
-                    (label :class "greeter-weather-forecast" :halign "end" :text "Rainy")
-                )
-                (label :class "greeter-weather-emoji" :text "🌧️")
+                :class "greeter-time-box"
+                :orientation "vertical"
+                :space-evenly false
+                :halign "start"
+                :valign "start"
+                (box :class "greeter-day"  :halign "start" "${day}")
+                (box :class "greeter-time" :halign "center" "${time}")
+                (box :class "greeter-date" :halign "end" "${date}")
             )
-            (label :class "greeter-weather-temperature" :text "21°C")
+    
+            (box
+                :class "greeter-profile-box"
+                :orientation "horizontal"
+                :valign "start"
+                :halign "center"
+                :space-evenly false
+                (image
+                    :class "greeter-profile-picture"
+                    :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
+                    :image-width 64
+                    :image-height 64
+                )
+                (label :class "greeter-profile-name" :halign "start" :text "Nicolas")
+            )
+            (box
+                :class "greeter-weather"
+                :orientation "vertical"
+                :space-evenly false
+                :valign "start"
+                :halign "center"
+                (box
+                    :orientation "horizontal"
+                    :space-evenly true
+                    :valign "center"
+                    (label :class "greeter-weather-forecast" :style "color: ${weather-hex};" :wrap true :text "${weather-stat}")
+                    (label :class "greeter-weather-emoji" :text "${weather-icon}")
+                )
+                (label :halign "center" :class "greeter-weather-temperature" :text "${weather-temp}°C")
+            )
+        )
+        (box
+            :class "greeter-bottom"
+            (box
+                :class "greeter-stats"
+                :orientation "vertical"
+                :valign "end"
+                :space-evenly false
+                :spacing 10
+                (box
+                    :class "greeter-stats-cpu"
+                    :orientation "horizontal"
+                    :space-evenly false
+                    :spacing 8
+                    (label :text "")
+                    (label :text "${round(EWW_CPU.avg, 0)}%")
+                    (scale
+                        :class "greeter-stats-progress greeter-stats-cpu-progress"
+                        :width 500
+                        :value {EWW_CPU.avg}
+                        :orientation "horizontal"
+                    )
+                )
+                (box
+                    :class "greeter-stats-memory"
+                    :orientation "horizontal"
+                    :space-evenly false
+                    :spacing 8
+                    (label :text "󱩵")
+                    (label :text "${round(EWW_RAM.used_mem_perc, 0)}%")
+                    (scale
+                        :class "greeter-stats-progress greeter-stats-memory-progress"
+                        :width 500
+                        :value {EWW_RAM.used_mem_perc}
+                        :orientation "horizontal"
+                    )
+                )
+                (box
+                    :class "greeter-stats-disk"
+                    :orientation "horizontal"
+                    :space-evenly false
+                    :spacing 8
+                    (label :text "󱛟")
+                    (label :text "${round(EWW_DISK["/"].used_perc, 0)}%")
+                    (scale
+                        :class "greeter-stats-progress greeter-stats-disk-progress"
+                        :width 500
+                        :value {round(EWW_DISK["/"].used_perc, 0)}
+                        :orientation "horizontal"
+                    )
+                )
+            )
         )
     )
 )

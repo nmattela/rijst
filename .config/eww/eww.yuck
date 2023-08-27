@@ -2,6 +2,7 @@
 (include "./system-menu.yuck")
 (include "./power-menu.yuck")
 (include "./greeter-menu.yuck")
+(include "./pocket-menu.yuck")
 
 (defwindow bar
   :exclusive true
@@ -51,9 +52,10 @@
 )
 
 (defwidget clock []
-  (box
+  (button
     :class "clock"
-    "${time}"
+    :onclick "./scripts/menu-reveal --toggle-pocket"
+    "${time-with-seconds}"
   )
 )
 

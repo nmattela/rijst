@@ -1,5 +1,7 @@
 #!/bin/sh
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 toggle_system() {
     is_open=$(eww get system-menu-open)
 
@@ -22,8 +24,22 @@ toggle_power() {
     fi
 }
 
+toggle_pocket() {
+    is_open=$(eww get pocket-menu-open)
+
+    if [[ $is_open == true ]]; then
+        $(eww update pocket-menu-open=false)
+    else
+        current_playing_player_index=$($SCRIPT_DIR/music --current-playing-player-index)
+        $(eww update active-player-index=$current_playing_player_index)
+        $(eww update pocket-menu-open=true)
+    fi
+}
+
 if [[ $1 == "--toggle-system" ]]; then
     toggle_system
 elif [[ $1 == "--toggle-power" ]]; then
     toggle_power
+elif [[ $1 == "--toggle-pocket" ]]; then
+    toggle_pocket
 fi

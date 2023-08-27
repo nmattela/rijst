@@ -1,5 +1,12 @@
-(defpoll date :interval "1s" `date +%Y-%m-%d`)
-(defpoll time :interval "1s" `date +%H:%M:%S`)
+(defpoll date :interval "1s" `date "+%Y %m %d"`)
+(defpoll time :interval "1s" `date +%H:%M`)
+(defpoll time-with-seconds :interval "1s" `date +%H:%M:%S`)
+
+(defpoll time-hours :interval "1s" `date +%H`)
+(defpoll time-minutes :interval "1s" `date +%M`)
+(defpoll time-seconds :interval "1s" `date +%S`)
+
+(defpoll day :interval "1s" "scripts/day --day")
 
 (defpoll network-icon :interval "1s" "scripts/network --icon")
 (defpoll network-status :interval "1s" "scripts/network --status")
@@ -32,7 +39,14 @@
 (defpoll workspace-active :interval "500ms" "scripts/workspaces --active-workspace")
 (defpoll window-active :interval "500ms" "scripts/windows --active-window")
 
+(defpoll weather-icon :interval "10m" "scripts/weather --icon")
+(defpoll weather-temp :interval "10m" "scripts/weather --temp")
+(defpoll weather-stat :interval "10m" "scripts/weather --stat")
+(defpoll weather-hex :interval "10m" "scripts/weather --hex")
+
 (defpoll dunst-history :interval "1s" `dunstctl history | jq '.data[]'`)
+
+(defpoll music-status :interval "1s" "scripts/music --status")
 
 ;; for sliders
 (defpoll volume :interval "1s" "scripts/sliders/volume-slider --value")
