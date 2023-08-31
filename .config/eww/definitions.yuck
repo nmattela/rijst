@@ -47,9 +47,10 @@
 (defpoll dunst-history :interval "1s" `dunstctl history | jq '.data[]'`)
 
 (defpoll music-status :interval "1s" "scripts/music --status")
+; (defvar music-status "[{\"index\":0,\"total\":1,\"name\":\"firefox.instance10428\",\"status\":\"Playing\",\"volume\":0,\"loop\":\"\",\"shuffle\":\"\",\"position\":\"0\",\"length\":\"0\",\"set_play\":\"playerctl play --player=firefox.instance10428\",\"set_pause\":\"playerctl pause --player=firefox.instance10428\",\"set_play_pause\":\"playerctl play-pause --player=firefox.instance10428\",\"set_stop\":\"playerctl stop --player=firefox.instance10428\",\"set_next\":\"playerctl next --player=firefox.instance10428\",\"set_previous\":\"playerctl previous --player=firefox.instance10428\",\"set_position\":\"playerctl position --player=firefox.instance10428\",\"set_volume\":\"playerctl volume --player=firefox.instance10428\",\"set_loop\":\"playerctl loop --player=firefox.instance10428\",\"set_shuffle\":\"playerctl shuffle --player=firefox.instance10428\",\"metadata\":{\"art_url\":\"file:///home/nmattela/.mozilla/firefox/firefox-mpris/10428_13.png\",\"album\":\"\",\"artist\":\"Ito Channel-奏星イト-\",\"title\":\"【博多弁耳舐めASMR】最奥までヌチャヌチャ突かれて無意識に腰がヒクヒクしちゃう♡ 高速耳かき/ジェルボール/マッサージ/耳はむ/炭酸【Ear Eating/Ear licking/舔耳朵】\"}}]")
 
 ;; for sliders
 (defpoll volume :interval "1s" "scripts/sliders/volume-slider --value")
-(defpoll volume-slider-indicator :interval "0s" "scripts/sliders/volume-slider --icon")
+(defpoll volume-slider-indicator :interval "1s" "scripts/sliders/volume-slider --icon")
 (defpoll brightness :interval "1s" "scripts/sliders/brightness-slider --value")
-(defpoll brightness-slider-indicator :interval "0s" "scripts/sliders/brightness-slider --icon")
+(defpoll brightness-slider-indicator :interval "1s" "scripts/sliders/brightness-slider --icon")
