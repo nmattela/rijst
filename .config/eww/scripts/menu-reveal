@@ -34,7 +34,7 @@ toggle_pocket() {
         $(eww close pocket-menu)
     else
         $(eww open pocket-menu)
-        # current_playing_player_index=$($SCRIPT_DIR/music --current-playing-player-index)
+        current_playing_player_index=$($SCRIPT_DIR/music --current-playing-player-index)
         $(eww update active-player-index=$current_playing_player_index)
         $(eww update pocket-menu-open=true)
     fi
