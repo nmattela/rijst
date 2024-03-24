@@ -8,7 +8,7 @@
   :exclusive true
   :monitor 0
   :stacking "bottom"
-  :focusable true
+  :focusable false
   :geometry (geometry :x "0%"
                       :y "0%"
                       :width "100%"

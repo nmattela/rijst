@@ -7,7 +7,9 @@ toggle_system() {
 
     if [[ $is_open == true ]]; then
         $(eww update system-menu-open=false)
+        $(eww close system-menu)
     else
+        $(eww open system-menu)
         $(eww update system-menu-open=true)
     fi
 }
@@ -29,8 +31,10 @@ toggle_pocket() {
 
     if [[ $is_open == true ]]; then
         $(eww update pocket-menu-open=false)
+        $(eww close pocket-menu)
     else
-        current_playing_player_index=$($SCRIPT_DIR/music --current-playing-player-index)
+        $(eww open pocket-menu)
+        # current_playing_player_index=$($SCRIPT_DIR/music --current-playing-player-index)
         $(eww update active-player-index=$current_playing_player_index)
         $(eww update pocket-menu-open=true)
     fi

@@ -1,17 +1,56 @@
-(defvar pocket-menu-open true)
+(defvar pocket-menu-open false)
 (defvar active-player-index 0)
 
+; This is the menu that opens when clicking on the clock on the hotbar
 (defwindow pocket-menu
     :monitor 0
     :focusable false
     :stacking "overlay"
+    :namespace "bar"
+    :exclusive true
     :geometry (geometry
                     :x 0
-                    :y 15
+                    :y 0
                     :width 0
                     :height 0
-                    :anchor "top center")
+                    :anchor "center")
     (pocket)
+)
+
+(defwidget pocket []
+    (revealer
+        :transition "crossfade"
+        :reveal pocket-menu-open
+        (eventbox
+            :onclick "./scripts/menu-reveal --toggle-pocket"
+            :width 1720
+            :height 880
+            (box
+                :class "pocket-root"
+                :orientation "vertical"
+                :space-evenly true
+                :width 800
+                :height 300
+                (box
+                    :orientation "horizontal"
+                    :space-evenly true
+                    (box
+                        :orientation "vertical"
+                        (pocket-profile)
+                        (pocket-clock)
+                    )
+                    (pocket-player
+                        :stati {music-status}
+                        :index active-player-index
+                    )
+                    (pocket-weather)
+                )
+                (box
+                    (pocket-stats)
+                )
+            )
+        )
+    )
 )
 
 (defwidget pocket-player [stati index]
@@ -26,7 +65,7 @@
             :class "pocket-player-description"
             :orientation "vertical"
             (label :class "pocket-player-title" :limit-width 50 :halign "start" :text "${stati[index].metadata.title}")
-            (label :class "pocket-player-album" :limit-widht 50 :halign "start" :text "${stati[index].metadata.artist}")
+            (label :class "pocket-player-album" :limit-width 50 :halign "start" :text "${stati[index].metadata.artist}")
         )
         (box
             :class "pocket-player-controls"
@@ -141,36 +180,5 @@
         (pocket-stats-scale :class "pocket-stats-cpu" :value {round(EWW_CPU.avg, 0)} :icon "")
         (pocket-stats-scale :class "pocket-stats-memory" :value {round(EWW_RAM.used_mem_perc, 0)} :icon "󱩵")
         (pocket-stats-scale :class "pocket-stats-disk" :value {round(EWW_DISK["/"].used_perc, 0)} :icon "󱛟")
-    )
-)
-
-(defwidget pocket []
-    (revealer
-        :transition "slidedown"
-        :reveal pocket-menu-open
-        (box
-            :class "pocket-root"
-            :orientation "vertical"
-            :space-evenly true
-            :width 800
-            :height 300
-            (box
-                :orientation "horizontal"
-                :space-evenly true
-                (box
-                    :orientation "vertical"
-                    (pocket-profile)
-                    (pocket-clock)
-                )
-                (pocket-player
-                    :stati {music-status}
-                    :index active-player-index
-                )
-                (pocket-weather)
-            )
-            (box
-                (pocket-stats)
-            )
-        )
     )
 )
