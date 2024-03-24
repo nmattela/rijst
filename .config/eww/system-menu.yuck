@@ -109,7 +109,7 @@
                             :class ""
                             :onclick ""
                             (box "${battery-icon}")
-                            (label :wrap true :text "${battery-label}")
+                            (label :wrap true :text {EWW_BATTERY == "" ? "No battery found" : "${EWW_BATTERY.status}"})
                         )
                         (system-pill
                             :class ""
