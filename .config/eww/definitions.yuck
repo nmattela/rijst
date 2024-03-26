@@ -29,6 +29,7 @@
 (defpoll battery-icon :interval "5s" "scripts/battery -i")
 (defpoll battery-label :interval "5s" "scripts/battery -l")
 (defpoll battery-available :interval "5s" "scripts/battery -a")
+(defpoll battery-text :interval "5s" "scripts/battery -t")
 (defpoll tips :interval "100h" "scripts/tips/tips")
 (defpoll tips-icon :interval "1s" "scripts/tips/toggle-tips --icon")
 (defpoll tips-status :interval "1s" "scripts/tips/toggle-tips --status")
@@ -43,6 +44,7 @@
 (defpoll weather-temp :interval "10m" "scripts/weather --temp")
 (defpoll weather-stat :interval "10m" "scripts/weather --stat")
 (defpoll weather-hex :interval "10m" "scripts/weather --hex")
+(defpoll weather-image :interval "10m" "scripts/weather --image")
 
 (defpoll dunst-history :interval "1s" `dunstctl history | jq '.data[]'`)
 

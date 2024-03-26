@@ -12,9 +12,10 @@
     (system)
 )
 
-(defwidget system-pill [class onclick]
+(defwidget system-pill [class style onclick]
     (button
         :class "${class} system-icon"
+        :style style
         :onclick onclick
         :height 70
         (box
@@ -44,7 +45,7 @@
                     :valign "center"
                     :halign "start"
                     (label :limit-width 30 :text "${data.summary.data}" :halign "start" :style "font-weight: bold;")
-                    (label :limit-width 30 :text "${data.body.data}" :halign "start")
+                    (label :limit-width 10 :text "${data.body.data}" :halign "start")
                 )
             )
             (button
@@ -79,18 +80,21 @@
                     :vexpand false
                     (system-pill
                         :class {network-status == "Disconnected" ? "" : "wifi-icon"}
+                        :style ""
                         :onclick ""
                         (box "${network-icon}")
                         (label :wrap true :text "${network-status}")
                     )
                     (system-pill
                         :class {bluetooth-status == "Off" ? "" : "bluetooth-icon"}
+                        :style ""
                         :onclick "blueberry && ./scripts/menu-reveal --toggle-system"
                         (box "${bluetooth-icon}")
                         (label :wrap true :text "${bluetooth-status == "" ? "No devices connected" : bluetooth-status}")
                     )
                     (system-pill
                         :class {volume-status == "Off" ? "" : "volume-icon"}
+                        :style ""
                         :onclick "./scripts/volume --toggle"
                         (box "${volume-icon}")
                         (label :wrap true :text "${volume-status}")
@@ -103,12 +107,14 @@
                     :vexpand false
                     (system-pill
                         :class ""
+                        :style "background-color: ${battery-color};"
                         :onclick ""
                         (box "${battery-icon}")
-                        (label :wrap true :text "${battery-label}")
+                        (label :wrap true :text "${battery-label} - ${battery-text}")
                     )
                     (system-pill
                         :class ""
+                        :style ""
                         :onclick ""
                         (box "${dnd-icon}")
                         (label :wrap true :text "${dnd-status}")
@@ -124,7 +130,7 @@
                         :orientaton "horizontal"
                         :space-evenly false
                         :spacing 3
-                        (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "amixer set Master toggle" "${volume-slider-indicator}")
+                        (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "./scripts/volume --toggle" "${volume-icon}")
                         (scale :class "system-slider-scale volume-slider"
                                 :value volume
                                 :orientation "h"
@@ -132,7 +138,7 @@
                                 :max 100
                                 :min 0
                                 :marks true
-                                :onchange "amixer set Master {}%")
+                                :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")
                     )
                     (box
                         :class "system-slider"
@@ -155,12 +161,12 @@
                 :orientation "vertical"
                 :space-evenly false
                 :spacing 10
-                ; (button
-                ;     :class "system-notification system-clear-all"
-                ;     :onclick "dunstctl history-clear"
-                ;     :visible {arraylength(dunst-history) > 0}
-                ;     (label :text "Clear all")
-                ; )
+                (button
+                    :class "system-notification system-clear-all"
+                    :onclick "dunstctl history-clear"
+                    :visible {arraylength(dunst-history) > 0}
+                    (label :text "Clear all")
+                )
                 (for notification-data in {dunst-history}
                     (notification :data "${notification-data}")
                 )

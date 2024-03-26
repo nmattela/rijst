@@ -42,15 +42,15 @@ icon() {
     if [[ "$bat" == *"until"* ]]; then
         
         if [[ "$level" -ge "80" ]]; then
-            echo "   "
+            echo " "
             elif [[ "$level" -ge "60" ]]; then
-            echo "   "
+            echo " "
             elif [[ "$level" -ge "40" ]]; then
-            echo "   "
+            echo " "
             elif [[ "$level" -ge "20" ]]; then
-            echo "   "
+            echo " "
         else
-            echo "   "
+            echo " "
         fi
     else
         if [[ "$level" -ge "80" ]]; then
@@ -68,14 +68,24 @@ icon() {
 }
 
 color() {
-    if [["$bat" == *"until"*]]; then
-        local green=$(echo "255" | awk '{printf "%d\n", $1 * (100 - ${value}) / 100}')
-        local red=$(echo "255" | awk '{printf "%d\n", $1 * ${value} / 100}')
+    if [[ "$bat" == *"until"* ]]; then
+        if [[ "$state" == *"Discharging"* ]]; then
+            local green=$(echo "255" | awk '{printf "%d\n", $1 * (100 - ${value}) / 100}')
+            local red=$(echo "255" | awk '{printf "%d\n", $1 * ${value} / 100}')
 
-        printf "#%02x%02x%02x\n" "$red" "$green" "00"
+            printf "#%02x%02x%02x\n" "$red" "$green" "00"
+        elif [[ "$state" == *"Charging"* ]]; then
+            echo "#f9dc5c"
+        else
+            echo "#4c566a"
+        fi
     else
         echo "#4c566a"
     fi
+}
+
+text() {
+    echo "${state::-1}"
 }
 
 class() {
@@ -86,6 +96,8 @@ class() {
     fi
 }
 
+
+
 if [[ $1 = "-l" ]]; then
     echo "${level}%"
 elif [[ $1 == "-c" ]]; then
@@ -94,6 +106,8 @@ elif [[ $1 = "-i" ]]; then
     icon
 elif [[ $1 == "-a" ]]; then
     available
+elif [[ $1 == "-t" ]]; then
+    text
 elif [[ $1 == "--color" ]]; then
     color
 fi
