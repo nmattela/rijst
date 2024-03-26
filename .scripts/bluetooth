@@ -1,0 +1,111 @@
+#!/bin/node
+
+const { execSync } = require("child_process");
+
+function isBluetoothOn() {
+    const res = execSync(`bluetoothctl show | grep Powered | awk '{print $2}'`)
+    return res.toString().includes(`yes`)
+}
+
+function getBluetoothDevices() {
+    let res = ""
+    try {
+        res = execSync(`bluetoothctl info`).toString()
+    } catch(e) {
+        res = e.stdout.toString()
+    }
+    if(res.includes(`DeviceSet (null) not available`)) {
+        return {}
+    } else {
+        return Object.fromEntries(res.split(`\n`).reduce((acc, val) => {
+            const titleMatch = val.match(/Device ([0-9A-Fa-f:]*) \(public\)/)
+            if(titleMatch !== null && titleMatch[1] !== undefined) {
+                const mac = titleMatch[1]
+                return [...acc, [mac, {}]]
+            } else {
+                const whitespaceMatch = val.match(/^\s*(.*):\s(.*)$/)
+                if(whitespaceMatch !== null && whitespaceMatch[1] !== undefined && whitespaceMatch[2] !== undefined) {
+                    const toBeExtended = acc.at(-1)
+                    if(toBeExtended !== undefined) {
+                        const mac = toBeExtended[0]
+                        const extend = toBeExtended[1]
+                        if(whitespaceMatch[1] === `Battery Percentage`) {
+                            const percentMatch = whitespaceMatch[2].match(/.*\(([0-9]*)\).*/)
+                            if(percentMatch !== null && percentMatch[1] !== undefined) {
+                                extend[`battery`] = percentMatch[1]
+                            } else {
+                                extend[whitespaceMatch[1]] = whitespaceMatch[2]
+                            }
+                        } else {
+                            extend[whitespaceMatch[1]] = whitespaceMatch[2]
+                        }
+                        if(whitespaceMatch[1] === `Name`) {
+                            extend[`Mac`] = mac
+                            return [...acc.slice(0, -1), [whitespaceMatch[2], extend]]
+                        } else {
+                            return [...acc.slice(0, -1), [mac, extend]]
+                        }
+                    } else {
+                        return acc
+                    }
+                } else {
+                    return acc
+                }
+            }
+        }, []))
+    }
+}
+
+function toggle() {
+    if(isBluetoothOn()) {
+        execSync(`bluetoothctl power off`)
+        execSync(`notify-send --icon=bluetooth-offline --urgency=normal "Bluetooth" "Bluetooth has been turned off."`)
+    } else {
+        execSync(`bluetoothctl power on`)
+        execSync(`notify-send --icon=volume-level-high --urgency=normal "Bluetooth" "Bluetooth has been turned on."`)
+    }
+}
+
+function icon() {
+    if(!isBluetoothOn()) {
+        // Bluetooth off
+        return `󰂲`
+    } else if(Object.keys(getBluetoothDevices()).length > 0) {
+        // Bluetooth on and at least one device connected
+        return `󰂱`
+    } else {
+        // Bluetooth on but no device connected
+        return `󰂯`
+    }
+}
+
+function status() {
+    const bluetoothDevices = getBluetoothDevices()
+    if(!isBluetoothOn()) {
+        return `Off`
+    } else if(Object.keys(bluetoothDevices).length > 0) {
+        return Object.entries(bluetoothDevices).map(([name, settings]) => {
+            return `${name} ${settings.battery}%`
+        }).join(`\n`)
+    } else {
+        return `No devices connected`
+    }
+}
+
+function handler() {
+    switch(process.argv[2]) {
+        case "toggle": return toggle()
+        case "devices": return getBluetoothDevices()
+        case "icon": return icon()
+        case "status": return status()
+        case "battery": return battery()
+        default: throw new Error(`Command not recognized: ${process.argv[2]}`)
+    }
+}
+
+try {
+    console.log(JSON.stringify(handler(), undefined, 2))
+} catch(e) {
+    console.log(Object.entries(e))
+    process.exit(1)
+}

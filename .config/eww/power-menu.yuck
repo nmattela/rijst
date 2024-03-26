@@ -1,9 +1,11 @@
 (defvar power-menu-open false)
 
+; The menu when you hit the power button on the hotbar
 (defwindow power-menu
     :monitor 0
     :focusable false
     :stacking "overlay"
+    :exclusive true
     :geometry (geometry
                     :x 0
                     :y 0
