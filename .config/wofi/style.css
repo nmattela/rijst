@@ -1,0 +1,102 @@
+:root {
+    --fg-col: rgb(255, 255, 255);
+    --bg-col: rgb(0, 0, 0);
+    --bg-col-light: rgb(127, 127, 127);
+    --blue: blue;
+    --green: green;
+}
+
+window {
+    height: 500px;
+    border: 0px;
+    border-color: var(--fg-col);
+    background-color: var(--bg-col);
+    border-radius: 15;
+}
+
+mainbox {
+    background-color: var(--bg-col);
+    /* children: [ mode-switcher, inputbar, listview ]; */
+}
+
+inputbar {
+    /* children: [prompt,entry]; */
+    background-color: var(--bg-col);
+    border-radius: 5px;
+    padding: 2px;
+}
+
+prompt {
+    background-color: var(--blue);
+    padding: 6px;
+    color: var(--bg-col);
+    border-radius: 5px;
+    margin: 20px 0px 0px 20px;
+}
+
+/* textbox-prompt-colon {
+    expand: false;
+    str: ":";
+} */
+
+entry {
+    padding: 6px;
+    margin: 20px 0px 0px 10px;
+    color: var(--fg-col);
+    background-color: var(--bg-col);
+}
+
+listview {
+    border: 0px 0px 0px;
+    padding: 10 10 0;
+    margin: 10 10 0 10;
+    columns: 4;
+    /* spacing: 15; */
+    background-color: var(--bg-col);
+}
+
+element {
+    padding: 5px;
+    background-color: var(--bg-col);
+    color: var(--fg-col)  ;
+    /* orientation: vertical;
+    spacing: 10; */
+}
+
+element-icon {
+    size: 56px;
+    /* horizontal-align: 0.5; */
+}
+
+element selected {
+    background-color:  var(--fg-col)2 ;
+    color: var(--bg-col);
+    border-radius: 8px;
+}
+
+element-text {
+    vertical-align: 0.5;
+    /* horizontal-align: 0.5;
+    expand: true; */
+    font: "Sofia Pro Bold 14";
+  }
+
+mode-switcher {
+    /* spacing: 0; */
+    margin: 5 10 5 10;
+    padding: 10 50 5 50;
+  }
+
+button {
+    padding: 10px;
+    background-color: var(--bg-col-light);
+    color: var(--fg-col);
+    vertical-align: 0.5; 
+    /* horizontal-align: 0.5; */
+}
+
+button selected {
+  background-color:  var(--green);
+  color: var(--bg-col);
+  border-radius: 10px;
+}

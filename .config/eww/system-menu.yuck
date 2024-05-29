@@ -84,18 +84,21 @@
                         :vexpand false
                         (system-pill
                             :class {network-status == "Disconnected" ? "" : "wifi-icon"}
+                            :style ""
                             :onclick ""
                             (box "${network-icon}")
                             (label :wrap true :text "${network-status}")
                         )
                         (system-pill
                             :class {bluetooth-status == "Off" ? "" : "bluetooth-icon"}
+                            :style ""
                             :onclick "blueberry && ./scripts/menu-reveal --toggle-system"
                             (box "${bluetooth-icon}")
                             (label :wrap true :text "${bluetooth-status == "" ? "No devices connected" : bluetooth-status}")
                         )
                         (system-pill
                             :class {volume-status == "Off" ? "" : "volume-icon"}
+                            :style ""
                             :onclick "./scripts/volume --toggle"
                             (box "${volume-icon}")
                             (label :wrap true :text "${volume-status}")
@@ -108,12 +111,14 @@
                         :vexpand false
                         (system-pill
                             :class ""
+                            :style ""
                             :onclick ""
                             (box "${battery-icon}")
                             (label :wrap true :text {EWW_BATTERY == "" ? "No battery found" : "${EWW_BATTERY.status}"})
                         )
                         (system-pill
                             :class ""
+                            :style ""
                             :onclick ""
                             (box "${dnd-icon}")
                             (label :wrap true :text "${dnd-status}")
