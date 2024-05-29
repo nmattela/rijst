@@ -28,6 +28,19 @@ refetch_data() {
 		weather_temp=`echo "$weather" | jq ".main.temp" | cut -d "." -f 1`
 		weather_icon_code=`echo "$weather" | jq -r ".weather[].icon" | head -1`
 		weather_description=`echo "$weather" | jq -r ".weather[].description" | head -1 | sed -e "s/\b\(.\)/\u\1/g"`
+		weather_coord_lon=`echo "$weather" | jq -r ".coord.lon"`
+		weather_coord_lat=`echo "$weather" | jq -r ".coord.lat"`
+
+		weawow_request=`curl -sf \
+							 --request GET \
+  							 --url "https://weawow.com/w4/en/weather?type=full_ajax&lat=${weather_coord_lat}&lng=${weather_coord_lon}&weaUrl=&provider=f&topProvider=k:l" \
+  							 --header 'Referer: https://weawow.com/' \
+  							 --cookie 'XSRF-TOKEN=v6lhLo3P7YFeNigdD8FotGrHqV12vntQSlwlHk1A; weawow_session=2U4KtWHtu0Ro2E633gwt3ASlWhqwbFD51W1AOgUU; 2U4KtWHtu0Ro2E633gwt3ASlWhqwbFD51W1AOgUU=eyJpdiI6InNXYjAzUTZ4VVplVThyd3U0ZnZTM0E9PSIsInZhbHVlIjoiU1cxeWFNNFhVZTVNMXErdWhTQnphK0JWTHZwbzg4WitcL0NtT09FUll3aVJ1RVZ3THZoU1ptR2dWMXlOQkJpNTRZU0FmbTN6ZWVEZG9uVXJRenhEQ2JQdnJpTWVpcjhhU1FQSzZrXC9WNmgweGNkc2FJbDRBak1SbjYrQ1dRc2pzNVU5TlBOTEJoNGlIcWpCaFVMN2VYOVY5blJjQ3E5M2cwSEpQM1pTY04rdzhaTjVrSjBJaFA0dlplZUU3TncrMm5YWlFDV0d4UDRsVEZ1cjZtczZhdklWR0ljWUhOZFVBaTNHXC9KRzRxT3ZGTmxuaStUSTF6N1l3YzJoK2xGN3dqMjRKN0M2SVlqU25VcE8xUlwvUkVEeVgxRVBvZmlJWGN4NFhOQlBjVUUwQ1dhek9UZHRTc1d6WjZjVTk3ZnJhcEg4UkRjek9HNFBUcUhyRDZNbXI5WjE2SHluTTdJVk5SU2xTV1lvbmprKys2dElVekE0VDNmdStpa2E2eFJha2JRZmJOMkVuNFJsSEd3XC9UbXd2Z1pHakNZbkpycVZwSUQ3K2k2REMrT01qbW4rUk81NURHZjArclh2b25Ua0xyamZQWTk4eU9uamJcL3Z2MSt3YlJKK05UK1wvWjJ1bFpnNmhDMUNTSEVOTUNYVU5VPSIsIm1hYyI6IjUwMGM5ZWRjNjg1MDBhNzY4ODM3MTBhZmI4ZDNjN2U2YjRlMzFiNTYxNTc4MThhOTliOTFiYmJhYjg5ZGM5OGMifQ%253D%253D; xRef=no; xOsc=1; xProvider=f; xTp=k%253Al'`
+		if [ ! -z "$weawow_request" ]; then
+			weawow_image_url=`echo "$weawow_request" | jq -r ".c.z.d"`
+			$(wget --quiet --output-document="$cache_dir/weather_image.jpg" "$weawow_image_url")
+		fi
+		
 
 		#Big long if statement of doom
 		if [ "$weather_icon_code" == "50d"  ]; then
@@ -133,6 +146,10 @@ weather_hex() {
 	cat "$cache_dir/weather.color"
 }
 
+weather_image() {
+	echo "$cache_dir/weather_image.jpg"
+}
+
 ## Execute
 if [[ "$1" == "--icon" ]]; then
 	data_needs_refetching && weather_icon
@@ -142,4 +159,8 @@ elif [[ "$1" == "--stat" ]]; then
 	data_needs_refetching && weather_stat
 elif [[ "$1" == "--hex" ]]; then
 	data_needs_refetching && weather_hex
+elif [[ "$1" == "--image" ]]; then
+	data_needs_refetching && weather_image
+elif [[ "$1" == "--fetch" ]]; then
+	refetch_data
 fi

@@ -38,7 +38,7 @@
                 :space-evenly false
                 (image
                     :class "greeter-profile-picture"
-                    :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
+                    :path "./images/profile-circle.png"
                     :image-width 64
                     :image-height 64
                 )

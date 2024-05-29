@@ -102,7 +102,11 @@
         (scale
             :class "pocket-player-progress"
             :orientation "horizontal"
+<<<<<<< HEAD
             :visible {player.length > 0}
+=======
+            ; :visible {stati[index].length > 0}
+>>>>>>> 4dd67faf74809a061278312701b0a894e35109d2
             :min 0
             :max {player.length}
             :value {player.position}
@@ -125,11 +129,11 @@
 (defwidget pocket-profile []
     (box
         :class "pocket-widget pocket-profile"
-        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(\"/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes.png\");"
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(\"./images/profile.png\");"
         :orientation "vertical"
         :space-evenly true
         (image
-            :path "/home/nmattela/Nextcloud/Images/Profile Pictures/ik-ben-een-poes-cirkel.png"
+            :path "./images/profile-circle.png"
             :image-width 64
             :image-height 64
         )
@@ -149,7 +153,11 @@
 (defwidget pocket-weather []
     (box
         :class "pocket-widget pocket-weather"
+<<<<<<< HEAD
         :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather.image}\");"
+=======
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather-image}\");"
+>>>>>>> 4dd67faf74809a061278312701b0a894e35109d2
         :orientation "vertical"
         (label :class "pocket-weather-stat" :style "color: ${weather.color};" :halign "start" :text "${weather.description}")
         (label :class "pocket-weather-temp" :halign "start" :text "${weather.temperature}°C")

@@ -10,6 +10,8 @@ program_icon() {
             echo "";;
         *"Visual Studio Code"*)
             echo "󰨞";;
+        *"Code - OSS"*)
+            echo "󰨞";;
         *Element*)
             echo "󰭹";;
         *"Kitty"*)

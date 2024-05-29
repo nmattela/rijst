@@ -12,9 +12,10 @@
     (system)
 )
 
-(defwidget system-pill [class onclick]
+(defwidget system-pill [class style onclick]
     (button
         :class "${class} system-icon"
+        :style style
         :onclick onclick
         :height 70
         (box
@@ -44,7 +45,7 @@
                     :valign "center"
                     :halign "start"
                     (label :limit-width 30 :text "${data.summary.data}" :halign "start" :style "font-weight: bold;")
-                    (label :limit-width 30 :text "${data.body.data}" :halign "start")
+                    (label :limit-width 10 :text "${data.body.data}" :halign "start")
                 )
             )
             (button
