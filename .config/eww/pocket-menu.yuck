@@ -102,11 +102,7 @@
         (scale
             :class "pocket-player-progress"
             :orientation "horizontal"
-<<<<<<< HEAD
             :visible {player.length > 0}
-=======
-            ; :visible {stati[index].length > 0}
->>>>>>> 4dd67faf74809a061278312701b0a894e35109d2
             :min 0
             :max {player.length}
             :value {player.position}
@@ -153,11 +149,7 @@
 (defwidget pocket-weather []
     (box
         :class "pocket-widget pocket-weather"
-<<<<<<< HEAD
         :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather.image}\");"
-=======
-        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather-image}\");"
->>>>>>> 4dd67faf74809a061278312701b0a894e35109d2
         :orientation "vertical"
         (label :class "pocket-weather-stat" :style "color: ${weather.color};" :halign "start" :text "${weather.description}")
         (label :class "pocket-weather-temp" :halign "start" :text "${weather.temperature}°C")

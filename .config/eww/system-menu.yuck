@@ -12,10 +12,9 @@
     (system)
 )
 
-(defwidget system-pill [class style onclick]
+(defwidget system-pill [class onclick]
     (button
         :class "${class} system-icon"
-        :style style
         :onclick onclick
         :height 70
         (box
