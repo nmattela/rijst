@@ -1,0 +1,136 @@
+(defwindow bar
+    :exclusive true
+    :monitor 0
+    :stacking "bottom"
+    :focusable false
+    :geometry (geometry :x "0%"
+                        :y "0%"
+                        :width "100%"
+                        :height "35px"
+                        :anchor "top center")
+    (bar-segments)
+  )
+  
+  (defwidget bar-segments []
+    (box
+      :class {arraylength(workspace-active.clients) == 0 ? "bar-segments-no-bg" : "bar-segments"}
+      :space-evenly true
+      (bar-segment :name "top-left" (box :halign "center" (workspaces)))
+      (bar-segment :name "top-center" (clock))
+      (bar-segment :name "top-right" (box :space-evenly true :halign "center" (icons) (power-button)))
+    )
+  )
+  
+  (defwidget bar-segment [name]
+    (box :class "bar-segment ${name}"
+         :space-evenly true
+         (children)))
+  
+  (defwidget workspaces []
+    (box
+      :class "workspaces"
+      :valign "center"
+      :halign "start"
+      :space-evenly true
+      :spacing 10
+      :width 380
+      :height 40
+      (for workspace in workspaces-list
+        (button
+          :class "workspace ${workspace.active ? "workspace-active" : workspace.used ? "workspace-used" : "workspace-unused"}"
+          :onclick "hyprctl dispatch workspace ${workspace.id}"
+          (box
+            :orientation "vertical"
+            (box
+              :class {arraylength(workspace.clients) == 1 ? "icon" : "icon-small"}
+              "${workspace.clients?.[0].icon}"
+            )
+            (box
+              :visible {arraylength(workspace.clients) > 1}
+              :spacing 1
+              (for icon in {jq(workspace, ".clients[1:] | map(. | .icon)") ?: []}
+                (box
+                  :class "icon-smaller"
+                  "${icon}"
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  
+  (defwidget clock []
+    (button
+      :class "clock"
+      :onclick "./scripts/menu-reveal --toggle-pocket"
+      ; "${time-with-seconds}"
+      {formattime(EWW_TIME, "%H:%M:%S")}
+    )
+  )
+  
+  (defwidget icons []
+    (box
+      :class "icons"
+      :spacing 5
+      :height 40
+      :width 160
+      (wifi) (bluetooth) (volume) (battery) (expand)
+    )
+  )
+  
+  (defwidget wifi []
+    (button
+      :class "${network-device == "null" ? "network-err" : "network-connected"} icon"
+      :tooltip "${network-device == "null" ? "Disconnected" : "Connected (${network-device.type})"}"
+      :onclick "nmtui"
+      "${network-icon}"
+    )
+  )
+  
+  (defwidget bluetooth []
+    (button
+      :class "icon ${arraylength(bluetooth-devices) == 0 ? "" : "bluetooth-icon"}"
+      :tooltip "${arraylength(bluetooth-devices) == 0 ? "Disconnected" : "Connected (${bluetooth-devices[0].name} - ${bluetooth-battery}%)" }"
+      :onclick "blueberry"
+      "${bluetooth-icon}")
+  )
+  
+  (defwidget battery []
+    (button
+      :visible {battery-available}
+      :class "icon ${battery-available ? "battery-icon" : ""}"
+      :tooltip "${battery-available ? "${battery-percentage}" : "No battery available"}"
+      "${battery-icon}"
+    )
+  )
+  
+  (defwidget volume []
+    (button
+      :class "icon volume-icon ${audio-device.mute ? "" : "volume-icon"}"
+      :tooltip "${audio-volume}%"
+      "${volume-icon}"
+    )
+  )
+  
+  (defwidget expand []
+    (button
+      :class "icon expand-icon"
+      :valign "center"
+      :halign "center"
+      :onclick "./scripts/menu-reveal --toggle-system"
+      "󰍝"
+    )
+  )
+  
+  (defwidget power-button []
+    (button
+      :class "icon power-button-icon"
+      :halign "end"
+      :width 52
+      :height 40
+      :onclick "./scripts/menu-reveal --toggle-power"
+      "󰐥"
+    )
+  )
