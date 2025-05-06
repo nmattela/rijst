@@ -40,8 +40,8 @@
                         (pocket-clock)
                     )
                     (pocket-player
-                        :stati {music-status}
-                        :index active-player-index
+                        :players {music-players}
+                        :player {music-players[active-player-index]}
                     )
                     (pocket-weather)
                 )
@@ -53,10 +53,10 @@
     )
 )
 
-(defwidget pocket-player [stati index]
+(defwidget pocket-player [players player]
     (box
         :class "pocket-widget pocket-player"
-        :style "background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(\"${stati[index].metadata.art_url}\");"
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url(\"${player.metadata.artUrl}\");"
         :orientation "vertical"
         :space-evenly false
         :halign "center"
@@ -64,8 +64,8 @@
         (box
             :class "pocket-player-description"
             :orientation "vertical"
-            (label :class "pocket-player-title" :limit-width 50 :halign "start" :text "${stati[index].metadata.title}")
-            (label :class "pocket-player-album" :limit-width 50 :halign "start" :text "${stati[index].metadata.artist}")
+            (label :class "pocket-player-title" :limit-width 50 :halign "start" :text "${player.metadata.title}")
+            (label :class "pocket-player-album" :limit-width 50 :halign "start" :text "${player.metadata.artist}")
         )
         (box
             :class "pocket-player-controls"
@@ -75,47 +75,47 @@
             :spacing 50
             (button
                 :class "pocket-player-shuffle"
-                :onclick "${stati[index].set_shuffle} Toggle"
-                {stati[index].shuffle == "On" ? "󰒟" : "󰒞"}
+                :onclick "ricecli music player shuffle ${player.name} Toggle"
+                {player.shuffle == "On" ? "󰒟" : "󰒞"}
             )
             (button
                 :class "pocket-player-prev"
-                :onclick "${stati[index].set_previous}"
+                :onclick "ricecli music player previous ${player.name}"
                 "󰒮"
             )
             (button
                 :class "pocket-player-pause"
-                :onclick "${stati[index].set_play_pause}"
-                "${stati[index].status == "Playing" ? "󰏤" : "󰐊"}"
+                :onclick "ricecli music player toggle ${player.name}"
+                {player.status == "Playing" ? "󰏤" : "󰐊"}
             )
             (button
                 :class "pocket-player-pause"
-                :onclick "${stati[index].set_next}"
+                :onclick "ricecli music player next ${player.name}"
                 "󰒭"
             )
             (button
                 :class "pocket-player-loop"
-                :onclick "${stati[index].set_loop} ${stati[index].loop == "None" ? "Track" : stati[index].loop == "Track" ? "Playlist" : "None"}"
-                "${stati[index].loop == "None" ? "󰑗" : stati[index].loop == "Track" ? "󰑘" : "󰑖"}"
+                :onclick "ricecli music player loop ${player.name} ${player.loop == "None" ? "Track" : player.loop == "Track" ? "Playlist" : "None"}"
+                {player.loop == "None" ? "󰑗" : player.loop == "Track" ? "󰑘" : "󰑖"}
             )
         )
         (scale
             :class "pocket-player-progress"
             :orientation "horizontal"
-            ; :visible {stati[index].length > 0}
+            :visible {player.length > 0}
             :min 0
-            :max {stati[index].length}
-            :value {stati[index].position}
-            :onchange "${stati[index].set_position} {}"
+            :max {player.length}
+            :value {player.position}
+            :onchange "ricecli music player position ${player.name} {}"
             :width 500
         )
         (box
             :orientation "horizontal"
-            (for status in stati
+            (for p in players
                 (button
                     :class "pocket-player-selector"
-                    :onclick "${EWW_CMD} update active-player-index=${status.index}"
-                    {active-player-index == status.index ? "•" : "◦"}
+                    :onclick "${EWW_CMD} update active-player-index=${player.index}"
+                    {player.name == p.name ? "•" : "◦"}
                 )
             )
         )
@@ -141,19 +141,19 @@
     (box
         :class "pocket-widget pocket-clock"
         :orientation "vertical"
-        (label :text "${time}")
-        (label :text "${date}")
+        (label :text {formattime(EWW_TIME, "%H:%M")})
+        (label :text {formattime(EWW_TIME, "%Y %m %d")})
     )
 )
 
 (defwidget pocket-weather []
     (box
         :class "pocket-widget pocket-weather"
-        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather-image}\");"
+        :style "background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url(\"${weather.image}\");"
         :orientation "vertical"
-        (label :class "pocket-weather-stat" :style "color: ${weather-hex};" :halign "start" :text "${weather-stat}")
-        (label :class "pocket-weather-temp" :halign "start" :text "${weather-temp}°C")
-        (label :class "pocket-weather-icon" :style "color: ${weather-hex};" :halign "end" :text "${weather-icon}")
+        (label :class "pocket-weather-stat" :style "color: ${weather.color};" :halign "start" :text "${weather.description}")
+        (label :class "pocket-weather-temp" :halign "start" :text "${weather.temperature}°C")
+        (label :class "pocket-weather-icon" :style "color: ${weather.color};" :halign "end" :text "${weather.icon}")
     )
 )
 
@@ -179,7 +179,7 @@
         :class "pocket-widget pocket-stats"
         :orientation "vertical"
         (pocket-stats-scale :class "pocket-stats-cpu" :value {round(EWW_CPU.avg, 0)} :icon "")
-        (pocket-stats-scale :class "pocket-stats-memory" :value {round(EWW_RAM.used_mem_perc, 0)} :icon "󱩵")
+        (pocket-stats-scale :class "pocket-stats-memory" :value {round(EWW_RAM.used_mem_perc, 0)} :icon "")
         (pocket-stats-scale :class "pocket-stats-disk" :value {round(EWW_DISK["/"].used_perc, 0)} :icon "󱛟")
     )
 )

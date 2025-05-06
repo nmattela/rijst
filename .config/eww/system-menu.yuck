@@ -12,15 +12,14 @@
     (system)
 )
 
-(defwidget system-pill [class style onclick]
+(defwidget system-pill [class onclick]
     (button
         :class "${class} system-icon"
-        :style style
         :onclick onclick
         :height 70
         (box
             :space-evenly false
-            :spacing 5
+            :spacing 10
             (children)
         )
     )
@@ -83,25 +82,22 @@
                         :hexpand false
                         :vexpand false
                         (system-pill
-                            :class {network-status == "Disconnected" ? "" : "wifi-icon"}
-                            :style ""
+                            :class {network-device != "null" ? "network-connected" : ""}
                             :onclick ""
                             (box "${network-icon}")
-                            (label :wrap true :text "${network-status}")
+                            (label :wrap true :text "${network-device != "null" ? network-device.connection : "Disconnected"}")
                         )
                         (system-pill
-                            :class {bluetooth-status == "Off" ? "" : "bluetooth-icon"}
-                            :style ""
+                            :class {arraylength(bluetooth-devices) == 0 ? "" : "bluetooth-icon"}
                             :onclick "blueberry && ./scripts/menu-reveal --toggle-system"
                             (box "${bluetooth-icon}")
-                            (label :wrap true :text "${bluetooth-status == "" ? "No devices connected" : bluetooth-status}")
+                            (label :wrap true :text "${arraylength(bluetooth-devices) == 0 ? "No devices connected" : bluetooth-devices[0]?.name}")
                         )
                         (system-pill
-                            :class {volume-status == "Off" ? "" : "volume-icon"}
-                            :style ""
+                            :class {audio-device.mute ? "" : "volume-icon"}
                             :onclick "./scripts/volume --toggle"
                             (box "${volume-icon}")
-                            (label :wrap true :text "${volume-status}")
+                            (label :wrap true :text "${audio-volume}%")
                         )
                     )
                     (box
@@ -120,8 +116,8 @@
                             :class ""
                             :style ""
                             :onclick ""
-                            (box "${dnd-icon}")
-                            (label :wrap true :text "${dnd-status}")
+                            (box "󰃠")
+                            (label :wrap true :text "Night Light Off")
                         )
                         (box "")
                     )
@@ -134,9 +130,9 @@
                             :orientaton "horizontal"
                             :space-evenly false
                             :spacing 3
-                            (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "amixer set Master toggle" "${volume-slider-indicator}")
+                            (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "amixer set Master toggle" "${audio-volume}")
                             (scale :class "system-slider-scale volume-slider"
-                                    :value volume
+                                    :value audio-volume
                                     :orientation "h"
                                     :width 500
                                     :max 100
@@ -149,14 +145,14 @@
                             :orientation "horizontal"
                             :space-evenly false
                             :spacing 3
-                            (button :width 25 :class "system-slider-icon system-brightness-slider-icon" "${brightness-slider-indicator}")
+                            (button :width 25 :class "system-slider-icon system-brightness-slider-icon" "${display-brightness.value}")
                             (scale :class "system-slider-scale brightness-slider"
                                     :orientation "h"
                                     :max 100
                                     :min 0
-                                    :value brightness
+                                    :value {display-brightness.value}
                                     :width 500
-                                    :onchange "brightnessctl s {}%")
+                                    :onchange "ricecli display brightness {}")
                         )
                     )
                 )

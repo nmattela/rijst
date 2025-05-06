@@ -25,9 +25,9 @@
                 :space-evenly false
                 :halign "start"
                 :valign "start"
-                (box :class "greeter-day"  :halign "start" "${day}")
-                (box :class "greeter-time" :halign "center" "${time}")
-                (box :class "greeter-date" :halign "end" "${date}")
+                (box :class "greeter-day"  :width 500 :halign "start" {formattime(EWW_TIME, "%A")})
+                (box :class "greeter-time" :width 500 :halign "center" {formattime(EWW_TIME, "%H:%M")})
+                (box :class "greeter-date" :width 500 :halign "end" {formattime(EWW_TIME, "%Y %m %d")})
             )
     
             (box
@@ -54,10 +54,10 @@
                     :orientation "horizontal"
                     :space-evenly true
                     :valign "center"
-                    (label :class "greeter-weather-forecast" :style "color: ${weather-hex};" :wrap true :text "${weather-stat}")
-                    (label :class "greeter-weather-emoji" :text "${weather-icon}")
+                    (label :class "greeter-weather-forecast" :style "color: ${weather.color};" :wrap true :text "${weather.description}")
+                    (label :class "greeter-weather-emoji" :text "${weather.icon}")
                 )
-                (label :halign "center" :class "greeter-weather-temperature" :text "${weather-temp}°C")
+                (label :halign "center" :class "greeter-weather-temperature" :text "${weather.temperature}°C")
             )
         )
         (box
@@ -87,7 +87,7 @@
                     :orientation "horizontal"
                     :space-evenly false
                     :spacing 8
-                    (label :text "󱩵")
+                    (label :text "")
                     (label :text "${round(EWW_RAM.used_mem_perc, 0)}%")
                     (scale
                         :class "greeter-stats-progress greeter-stats-memory-progress"
