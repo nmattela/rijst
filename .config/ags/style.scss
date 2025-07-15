@@ -1,0 +1,154 @@
+// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+$fg-color: #4c566a; // #{"@theme_fg_color"};
+$bg-color: #3b4252;  // #{"@theme_bg_color"};
+
+$err-color: #FAAB78;
+
+$wifi-color: #FAAB78;
+$bluetooth-color: #0083fc;
+$volume-color: #5C8984;
+$power-color: #A86464;
+$power-reboot-color: #A0C49D;
+$power-lock-color: #8294C4;
+$power-logout-color: #FFD966;
+$brightness-color: #F49D1A;
+
+$unused-workspaces: #5e81ac;
+$used-workspaces: $wifi-color;
+$active-workspaces: $bluetooth-color;
+
+$temperature-color: #ffd6a5;
+$rain-color: #90dbf4;
+
+$day-color: #fb6f92;
+$date-color: #a2d2ff;
+
+$cpu-color: #5aa9e6;
+$memory-color: #cce8cc;
+$disk-color: #fec89a;
+
+* {
+    all: unset;
+    transition: 200ms ease-out;
+}
+
+window.Bar {
+    background: transparent;
+    // color: $fg-color;
+    font-weight: bold;
+
+    >centerbox {
+        background: transparent;
+        border-radius: 10px;
+        margin: 10px 50px;
+    }
+
+    button {
+        border-radius: 1rem;
+        margin: 2px;
+    }
+
+    .clock {
+        font-family: Ubuntu;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+}
+
+.icon {
+    border-radius: 1000px;
+    padding: 0.3rem;
+    font-size: 1rem;
+}
+
+.Workspaces {
+    background-color: rgba($fg-color, 0.8);
+    border-radius: 100px;
+    padding: 0.5rem;
+    
+    .workspace {
+        border-radius: 100px;
+        background-color: $unused-workspaces;
+
+        padding: 0.5rem;
+        border: none;
+        font-size: 1rem;
+    }
+    
+    .workspace-used {
+        background-color: $used-workspaces;
+    }
+    
+    .workspace-focused {
+        background-color: $active-workspaces;
+    }
+}
+
+.Power {
+    background-color: $power-color;
+    border-radius: 10000px;
+    margin: 4px 10px;
+}
+
+.SystemTray {
+    border: none;
+    background-color: rgba($fg-color, 0.8);
+    border-radius: 100px;
+    padding: 0.5rem;
+
+    .network {
+    }
+
+    .network-connected {
+        background-color: $wifi-color;
+    }
+
+    .bluetooth {
+    }
+
+    .bluetooth-enabled {
+        background-color: $bluetooth-color;
+    }
+
+    .audio {
+    }
+
+    .audio-enabled {
+        background-color: $volume-color;
+    }
+
+    .battery {
+    }
+
+    .battery-charging {
+        background-color: $power-logout-color
+    }
+}
+
+.SystemMenu {
+    border: none;
+    background-color: $bg-color;
+    border-radius: 10px;
+
+    .header {
+        padding: 0.8rem;
+        background-color: $fg-color;
+        border-radius: 10px;
+    }
+    
+    >box {
+        padding: 20px;
+    }
+
+    .pill {
+        border-radius: 10px;
+
+        >centerbox {
+            padding: 0.5rem;
+
+            >label {
+                // font-size: 0.5rem;
+            }
+        }
+    }
+}
