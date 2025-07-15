@@ -2,3 +2,4 @@
 **/fish-kubectl-completions
 **/fish_variables
 ./config/fish/fish_variables
+./config/hypr/hypr.d/monitors.conf
