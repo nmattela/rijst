@@ -1,5 +1,5 @@
-import app from "ags/gtk3/app"
-import {Gdk, Astal, Gtk} from "ags/gtk3"
+import app from "ags/gtk4/app"
+import {Gdk, Astal, Gtk} from "ags/gtk4"
 import Pango from "gi://Pango?version=1.0"
 
 export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
@@ -16,21 +16,21 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
             gdkmonitor={gdkmonitor}
             visible={true}
             widthRequest={400}
-            marginRight={50}
-            onButtonPressEvent={(window, event) => {
-                console.log(`slorp`, event)
-                if(event.button === Gdk.KEY_Escape) {
-                    window.hide()
-                }
-            }}
-            onKeyPressEvent={(self, event) => {
-                console.log(`yuuu`, event.string, Gdk.KEY_Escape)
-                self.hide()
-                if (event.keyval === Gdk.KEY_Escape) {
-                }
-              }}
+            marginRight={100}
+            // onButtonPressEvent={(window, event) => {
+            //     console.log(`slorp`, event)
+            //     if(event.button === Gdk.KEY_Escape) {
+            //         window.hide()
+            //     }
+            // }}
+            // onKeyPressEvent={(self, event) => {
+            //     console.log(`yuuu`, event.string, Gdk.KEY_Escape)
+            //     self.hide()
+            //     if (event.keyval === Gdk.KEY_Escape) {
+            //     }
+            //   }}
             >
-            {/* <Gtk.EventControllerKey
+            <Gtk.EventControllerKey
                 onKeyPressed={({ widget }, keyval) => {
                     if (keyval === Gdk.KEY_Escape) {
                         widget.hide()
@@ -38,7 +38,7 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                 }}
             >
 
-            </Gtk.EventControllerKey> */}
+            </Gtk.EventControllerKey>
             <box
                 orientation={Gtk.Orientation.VERTICAL}
                 spacing={10}
@@ -59,44 +59,51 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                     >
                     </button>
                 </centerbox>
-                <box
-                    class="pills"
-                    spacing={10}
-                    orientation={Gtk.Orientation.VERTICAL}
+                <Gtk.FlowBox
+                    maxChildrenPerLine={3}
+                    activateOnSingleClick={false}
+                    homogeneous
+                    rowSpacing={10}
+                    columnSpacing={10}
                 >
-                    <box orientation={Gtk.Orientation.HORIZONTAL} spacing={10}>
-                        <SystemPill
-                            icon={`network-wireless`}
-                            label={`Klarrio Guest`}
-                            color={`#FAAB78`}
-                        />
-                        <SystemPill
-                            icon={`󰂯`}
-                            label={`WH-1000XM6`}
-                            color={`#0083fc`}
-                        />
-                        <SystemPill
-                            icon={`audio-volume-muted`}
-                            label={`87%`}
-                            color={`#5C8984`}
-                        />
-                    </box>
-                    <box orientation={Gtk.Orientation.HORIZONTAL} spacing={10}>
-                        <SystemPill
-                            icon={`audio-input-microphone`}
-                            label={`Off`}
-                            color={`#5C8984`}
-                        />
-                        <SystemPill
-                            icon={`battery`}
-                            label={`42% - Charging`}
-                            color={`#FFD966`}
-                        />
-                        <SystemPill
-                            icon={`accessories-screenshot-tool`}
-                            color={`#fb6f92`}
-                        />
-                    </box>
+                    <SystemPill
+                        icon={`network-wireless`}
+                        label={`Klarrio Guest`}
+                        color={`#FAAB78`}
+                    />
+                    <SystemPill
+                        icon={`󰂯`}
+                        label={`WH-1000XM6`}
+                        color={`#0083fc`}
+                    />
+                    <SystemPill
+                        icon={`audio-volume-muted`}
+                        label={`87%`}
+                        color={`#5C8984`}
+                    />
+                    <SystemPill
+                        icon={`audio-input-microphone`}
+                        label={`Off`}
+                        color={`#5C8984`}
+                    />
+                    <SystemPill
+                        icon={`battery`}
+                        label={`42% - Charging`}
+                        color={`#FFD966`}
+                    />
+                    <SystemPill
+                        icon={`accessories-screenshot-tool`}
+                        color={`#fb6f92`}
+                    />
+                </Gtk.FlowBox>
+                <box class="sliders" heightRequest={100}>
+                    <label label="bruh" />
+                    <slider
+                        value={0.5}
+                        min={0}
+                        max={1}
+                        onChangeValue={({ value }) => print(value)}
+                    />
                 </box>
             </box>
         </window>
@@ -112,22 +119,24 @@ function SystemPill({ icon, label, color }: { icon: string, label?: string, colo
             widthRequest={120}
             heightRequest={60}
         >
-            <centerbox
+            <box
                 orientation={Gtk.Orientation.HORIZONTAL}
                 spacing={5}
             >
-                <icon
-                    $type="start"
-                    icon={icon}
+                <image
+                    halign={Gtk.Align.START}
+                    iconName={icon}
                 />
                 {label !== undefined && label !== `` && (
                     <label
-                        $type="end"
+                        halign={Gtk.Align.END}
                         label={label}
+                        useMarkup
+                        wrap
                         ellipsize={Pango.EllipsizeMode.END}
                     />
                 )}
-            </centerbox>
+            </box>
         </button>
     )
 }

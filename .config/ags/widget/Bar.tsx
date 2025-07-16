@@ -1,9 +1,8 @@
-import app from "ags/gtk3/app"
-import { Astal, Gdk, Gtk } from "ags/gtk3"
-// import Astal from "ags/gtk3/astal"
+import app from "ags/gtk4/app"
+import { Astal, Gdk, Gtk } from "ags/gtk4"
+// import Astal from "ags/gtk4/astal"
 import { createBinding, createState } from "ags"
 import Workspaces from "./Workspaces"
-import { Box } from "astal/gtk3/widget"
 import SystemTray from "./SystemTray"
 import Power from "./Power"
 import SystemMenu from "./SystemMenu"
@@ -22,6 +21,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                 exclusivity={Astal.Exclusivity.EXCLUSIVE}
                 anchor={TOP | LEFT | RIGHT}
                 application={app}
+                visible={true}
             >
                 <centerbox>
                     <Workspaces $type="start" />

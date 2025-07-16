@@ -1,11 +1,11 @@
-import { Gtk } from "ags/gtk3"
+import { Gtk } from "ags/gtk4"
 import { createBinding, createState, With } from "ags"
 import Network from "gi://AstalNetwork"
 import Bluetooth from "gi://AstalBluetooth"
 import Wp from "gi://AstalWp"
 import Battery from "gi://AstalBattery"
 import Apps from "gi://AstalApps"
-import app from "ags/gtk3/app"
+import app from "ags/gtk4/app"
 import Tray from "gi://AstalTray"
 import SystemMenu from "./SystemMenu"
 
@@ -50,27 +50,27 @@ function NetworkIcon() {
         console.log(wifi, wired)
         if(wifi !== null) {
             return (
-                <icon
+                <image
                     tooltipText={wifi.ssid}
                     class="icon network network-connected"
-                    icon={wifi.iconName}
+                    iconName={wifi.iconName}
                 />
             )
         } else if(isWired) {
             console.log(wired.iconName)
             return (
-                <icon
+                <image
                     tooltipText={wired.speed.toString()}
                     class="icon network network-connected"
-                    icon={wired.iconName}
+                    iconName={wired.iconName}
                 />
             )
         } else {
             return (
-                <icon
+                <image
                     tooltipText="Not connected"
                     class="icon network"
-                    icon={`network-wireless`}
+                    iconName={`network-wireless`}
                 />
             )
         }
@@ -142,8 +142,8 @@ function AudioIcon() {
             widthRequest={30}
             onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
         >
-            <icon
-                icon={label}
+            <image
+                iconName={label}
             />
         </button>
     )
@@ -199,8 +199,8 @@ function BatteryIcon() {
             class={createBinding(battery, `charging`).as(charging => `icon battery ${charging ? `battery-charging` : ``}`)}
             widthRequest={30}
         >
-            <icon
-                icon={createBinding(battery, `iconName`)}
+            <image
+                iconName={createBinding(battery, `iconName`)}
             />
         </button>
     )
@@ -223,13 +223,7 @@ function ExpandButton() {
             class={`icon`}
             widthRequest={30}
             onClicked={() => {
-                const systemMenu = app.get_window(`System Menu`)
-                if(systemMenu?.visible) {
-                    systemMenu.hide()
-                } else {
-                    systemMenu?.show()
-                }
-
+                app.toggle_window(`System Menu`)
             }}
         >
             󰍝
