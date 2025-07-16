@@ -1,6 +1,6 @@
 import Hyprland from "gi://AstalHyprland"
-import app from "ags/gtk3/app"
-import { Gtk } from "ags/gtk3"
+import app from "ags/gtk4/app"
+import { Gtk } from "ags/gtk4"
 import { Accessor, createBinding, For, With } from "ags"
 
 export default function Workspaces() {
