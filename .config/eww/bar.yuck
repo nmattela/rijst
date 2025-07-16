@@ -43,7 +43,7 @@
             :orientation "vertical"
             (box
               :class {arraylength(workspace.clients) == 1 ? "icon" : "icon-small"}
-              "${workspace.clients?.[0].icon}"
+              "${workspace.clients?.[0].icon ?: "•"}"
             )
             (box
               :visible {arraylength(workspace.clients) > 1}
@@ -51,7 +51,7 @@
               (for icon in {jq(workspace, ".clients[1:] | map(. | .icon)") ?: []}
                 (box
                   :class "icon-smaller"
-                  "${icon}"
+                  "${icon ?: "•"}"
                 )
               )
             )

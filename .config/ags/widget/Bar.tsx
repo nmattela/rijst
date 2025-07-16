@@ -13,7 +13,6 @@ import GLib from "gi://GLib?version=2.0"
 export default function Bar(gdkmonitor: Gdk.Monitor) {
     const time = createPoll("", 1000, () => GLib.DateTime.new_now_local().format(`%H:%M:%S`)!)
     const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor
-    print(`penis`)
 
     return (
         <>
