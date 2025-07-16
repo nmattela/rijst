@@ -5,6 +5,7 @@ import SystemMenu from "./widget/SystemMenu"
 
 app.start({
     css: style,
+    icons: `/home/nmattela/.config/ags/icons`,
     main() {
         app.get_monitors().map(Bar)
         app.get_monitors().map(SystemMenu)
