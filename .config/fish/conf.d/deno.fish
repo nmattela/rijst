@@ -1,1 +1,0 @@
-source "/home/nmattela/.deno/env.fish"

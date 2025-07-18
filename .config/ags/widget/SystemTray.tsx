@@ -1,5 +1,5 @@
-import { Gtk } from "ags/gtk4"
-import { createBinding, createState, With } from "ags"
+import { Gdk, Gtk } from "ags/gtk4"
+import { Accessor, createBinding, createState, With } from "ags"
 import Network from "gi://AstalNetwork"
 import Bluetooth from "gi://AstalBluetooth"
 import Wp from "gi://AstalWp"
@@ -8,6 +8,9 @@ import Apps from "gi://AstalApps"
 import app from "ags/gtk4/app"
 import Tray from "gi://AstalTray"
 import SystemMenu from "./SystemMenu"
+import Notification from "./Notification"
+import { execAsync } from "ags/process"
+import Pango from "gi://Pango"
 
 const apps = new Apps.Apps({
   nameMultiplier: 2,
@@ -18,28 +21,27 @@ const apps = new Apps.Apps({
 const tray = Tray.get_default()
 
 export default function SystemTray() {
+
     return (
-        <>
         <box
             class="SystemTray"
             valign={Gtk.Align.CENTER}
             halign={Gtk.Align.START}
             spacing={5}
         >
-            <NetworkIcon />
-            <BluetoothIcon />
-            <AudioIcon />
-            <BatteryIcon />
+            <NetworkIcon small />
+            <BluetoothIcon small />
+            <AudioIcon small />
+            <BatteryIcon small />
             {
                 tray.get_items().map(item => <TrayIcon item={item}></TrayIcon>)
             }
             <ExpandButton />
         </box>
-        </>
     )
 }
 
-function NetworkIcon() {
+export function NetworkIcon({ small = false }: { small?: boolean }) {
     const network = Network.get_default()
     const wifi = createBinding(network, `wifi`)
     const wired = createBinding(network, `wired`)
@@ -47,7 +49,6 @@ function NetworkIcon() {
     const isWired = createBinding(network, `get_wired`).as(v => v !== null).get()
 
     const icon = createBinding(network, `wifi`).as(wifi => createBinding(network, `wired`).as(wired => {
-        console.log(wifi, wired)
         if(wifi !== null) {
             return (
                 <image
@@ -57,7 +58,6 @@ function NetworkIcon() {
                 />
             )
         } else if(isWired) {
-            console.log(wired.iconName)
             return (
                 <image
                     tooltipText={wired.speed.toString()}
@@ -76,51 +76,94 @@ function NetworkIcon() {
         }
     }))
 
-    return (
-        <button
-            widthRequest={30}
-            onClicked={() => apps.fuzzy_query("nmtui").at(0)?.launch()}
-        >
-            <With value={icon}>
-                {(icon) => icon.get()}
-            </With>
-        </button>
-    )
+    if(small) {
+        return (
+            <button
+                widthRequest={30}
+                onClicked={() => apps.fuzzy_query("nmtui").at(0)?.launch()}
+                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+            >
+                <With value={icon}>
+                    {(icon) => icon.get()}
+                </With>
+            </button>
+        )
+    } else {
+        return (
+            <SystemPill
+                icon={`network-wireless`}
+                label={`Klarrio Guest`}
+                color={`#FAAB78`}
+                onClick={() => execAsync([`kitty`, `nmtui`])}
+            />
+        )
+    }
+
     
 }
 
-function BluetoothIcon() {
+export function BluetoothIcon({ small = false }: { small?: boolean }) {
     const bluetooth = Bluetooth.get_default()
     const devices = createBinding(bluetooth, `devices`).as(devices => devices.filter(device => device.connected))
-    const tooltipText = devices.as(devices => (
+    const label = devices.as(devices => (
         devices.length === 0
             ? `No devices connected`
             : devices.length === 1
                 ? devices[0].name
                 : `${devices.length} devices connected`
     ))
-    const bluetoothIcon = devices.as(devices => (
-        bluetooth.isPowered && devices.length === 0
-            ? `󰂯`
-            : bluetooth.isPowered && devices.length > 0
-                ? `󰂱`
-                : `󰂲`
-    ))
+    const isPowered = createBinding(bluetooth, `isPowered`)
+    const bluetoothIcon = devices.as(devices => isPowered.as(isPowered => (
+        isPowered && devices.length === 0
+            ? /*`󰂯`*/`bluetooth-on-symbolic`
+            : isPowered && devices.length === 1
+                ? devices.at(0)?.icon ?? `bluetooth-connected-symbolic`
+                : isPowered && devices.length > 1
+                    ? /*`󰂱`*/`bluetooth-connected-symbolic`
+                    : /*`󰂲`*/`bluetooth-off-symbolic`
+    )).get())
 
-    return (
-        <button
-            label={bluetoothIcon}
-            tooltipText={tooltipText}
-            class={devices.as(devices => `icon bluetooth ${devices.length > 0 ? `bluetooth-enabled` : ``}`)}
-            widthRequest={30}
-            onClicked={() => apps.fuzzy_query("bluetooth").at(0)?.launch()}
-        />
-    )
+    if(small) {
+        return (
+            <With value={devices}>
+                {devices => (
+                    <button
+                        iconName={bluetoothIcon}
+                        tooltipText={label}
+                        class={`icon bluetooth ${devices.length > 0 ? `bluetooth-enabled` : ``}`}
+                        widthRequest={30}
+                        onClicked={() => apps.fuzzy_query("bluetooth").at(0)?.launch()}
+                        cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                    />
+                )}
+            </With>
+        )
+    } else {
+        return (
+            <With value={bluetoothIcon}>
+                {bluetoothIcon => label.as(bluetoothLabel => (
+                    <SystemPill
+                        icon={bluetoothIcon}
+                        label={bluetoothLabel}
+                        color={`#0083fc`}
+                        onClick={() => execAsync(`blueberry`)}
+                    />
+                )).get()}
+            </With>
+        )
+    }
+
 }
 
-function AudioIcon() {
+export function AudioIcon({ small = false }: { small?: boolean }) {
     const audio = Wp.get_default()
     const defaultSpeaker = audio?.audio.defaultSpeaker
+
+    const volume = audio !== null ? createBinding(audio.defaultSpeaker, `volume`) : undefined
+    const volumeIcon = audio !== null ? createBinding(audio.defaultSpeaker, `volumeIcon`) : undefined
+    const muted = audio !== null ? createBinding(audio.defaultSpeaker, `mute`) : undefined
+
+    const label = volume?.as(volume => muted?.as(muted => muted ? `Muted` : `${Math.round(volume * 100)}%`).get() ?? ``)
 
     const tooltipText = audio === null || defaultSpeaker === undefined
         ? `No audio device found`
@@ -130,23 +173,31 @@ function AudioIcon() {
         ? `icon audio`
         : `icon audio ${!defaultSpeaker.mute ? `audio-enabled` : ``}`
 
-    const label = audio === null || defaultSpeaker === undefined
-        ? `audio-volume-muted`
-        : defaultSpeaker.icon
-    print(label)
+        if(small) {
+            return (
+                <button
+                    tooltipText={tooltipText}
+                    class={className}
+                    widthRequest={30}
+                    onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
+                    cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                >
+                    <image
+                        iconName={volumeIcon}
+                    />
+                </button>
+            )
+        } else {
+            return (
+                <SystemPill
+                    icon={volumeIcon ?? ``}
+                    label={label}
+                    color={`#5C8984`}
+                    onClick={() => execAsync(`pavucontrol`)}
+                />
+            )
+        }
     
-    return (
-        <button
-            tooltipText={tooltipText}
-            class={className}
-            widthRequest={30}
-            onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
-        >
-            <image
-                iconName={label}
-            />
-        </button>
-    )
 
     // if(audio === null) {
     //     return (
@@ -190,20 +241,34 @@ function AudioIcon() {
 
 }
 
-function BatteryIcon() {
+export function BatteryIcon({ small = false }: { small?: boolean }) {
     const battery = Battery.get_default()
 
-    return (
-        <button
-            tooltipText={createBinding(battery, `batteryLevel`).as(b => `${b*100}%${battery.charging ? ` - Charging` : ``}`)}
-            class={createBinding(battery, `charging`).as(charging => `icon battery ${charging ? `battery-charging` : ``}`)}
-            widthRequest={30}
-        >
-            <image
-                iconName={createBinding(battery, `iconName`)}
+    const iconName = createBinding(battery, `iconName`)
+    const label = createBinding(battery, `batteryLevel`).as(b => `${b*100}%${battery.charging ? ` - Charging` : ``}`)
+
+    if(small) {
+        return (
+            <button
+                tooltipText={label}
+                class={createBinding(battery, `charging`).as(charging => `icon battery ${charging ? `battery-charging` : ``}`)}
+                widthRequest={30}
+            >
+                <image
+                    iconName={iconName}
+                />
+            </button>
+        )
+    } else {
+        return (
+            <SystemPill
+                icon={iconName}
+                label={label}
+                color={`#FFD966`}
             />
-        </button>
-    )
+        )
+    }
+
 }
 
 function TrayIcon({ item }: { item: Tray.TrayItem }) {
@@ -217,16 +282,67 @@ function TrayIcon({ item }: { item: Tray.TrayItem }) {
 }
 
 function ExpandButton() {
+
+    const [open, setOpen] = createState(app.get_window(`System Menu`)?.visible ?? false)
+    app.connect(`window-toggled`, (source, window) => {
+        if(window.name === `System Menu`) {
+            setOpen(window.visible)
+        }
+    })
+
     return (
         <button
             tooltipText={`Open drawer`}
-            class={`icon`}
+            class={`icon hover-fg`}
             widthRequest={30}
             onClicked={() => {
                 app.toggle_window(`System Menu`)
             }}
+            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
         >
-            󰍝
+            {/*󰍝*/}
+            <With value={open}>
+                {open => (
+                    <image
+                        iconName={open ? `go-up` : `go-down`}
+                    />
+                )}
+            </With>
+        </button>
+    )
+}
+
+
+function SystemPill({ icon, label, color, onClick }: { icon: string | Accessor<string>, label?: string | Accessor<string>, color: string, onClick?: () => void }) {
+
+    return (
+        <button
+            class={`pill ${onClick !== undefined ? `clickable` : ``}`}
+            css={`background: ${color};`}
+            widthRequest={120}
+            heightRequest={60}
+            cursor={onClick !== undefined ? Gdk.Cursor.new_from_name(`pointer`, null) : undefined}
+            tooltipText={label}
+            onClicked={onClick}
+        >
+            <box
+                orientation={Gtk.Orientation.HORIZONTAL}
+                spacing={5}
+            >
+                <image
+                    halign={Gtk.Align.START}
+                    iconName={icon}
+                />
+                {label !== undefined && label !== `` && (
+                    <label
+                        halign={Gtk.Align.END}
+                        label={label}
+                        useMarkup
+                        wrap
+                        ellipsize={Pango.EllipsizeMode.END}
+                    />
+                )}
+            </box>
         </button>
     )
 }

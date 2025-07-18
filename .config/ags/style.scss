@@ -7,6 +7,7 @@ $err-color: #FAAB78;
 $wifi-color: #FAAB78;
 $bluetooth-color: #0083fc;
 $volume-color: #5C8984;
+$mic-color: #B5B682;
 $power-color: #A86464;
 $power-reboot-color: #A0C49D;
 $power-lock-color: #8294C4;
@@ -56,10 +57,30 @@ window.Bar {
     }
 }
 
+.bg {
+    background-color: $bg-color;
+}
+
+.fg {
+    background-color: $fg-color;
+}
+
 .icon {
     border-radius: 1000px;
     padding: 0.3rem;
     font-size: 1rem;
+}
+
+.icon:hover {
+    background-color: $bg-color;
+}
+
+.hover-fg:hover {
+    background-color: $fg-color;
+}
+
+.hover-bg:hover {
+    background-color: $bg-color;
 }
 
 .Workspaces {
@@ -86,9 +107,14 @@ window.Bar {
 }
 
 .Power {
-    background-color: $power-color;
-    border-radius: 10000px;
-    margin: 4px 10px;
+    padding: 0.5rem;
+
+    >button {
+        padding: 0.5rem;
+        background-color: $power-color;
+        border-radius: 10000px;
+        margin: 4px 10px;
+    }
 }
 
 .SystemTray {
@@ -104,11 +130,19 @@ window.Bar {
         background-color: $wifi-color;
     }
 
+    .network-connected:hover {
+        filter: brightness(90%);
+    }
+
     .bluetooth {
     }
 
     .bluetooth-enabled {
         background-color: $bluetooth-color;
+    }
+
+    .network-enabled:hover {
+        filter: brightness(90%);
     }
 
     .audio {
@@ -141,6 +175,7 @@ window.Bar {
 
         .pill {
             border-radius: 10px;
+            background-color: $fg-color;
     
             >box {
                 padding: 0.5rem;
@@ -150,11 +185,61 @@ window.Bar {
                 }
             }
         }
+
+        .clickable:hover {
+            filter: brightness(90%);
+        }
     
         .sliders {
-            background: green;
-            .slider {
-                background: red;
+            .sliderbox {
+                background-color: $fg-color;
+                padding: 0.5rem;
+                border-radius: 10px;
+
+                trough {
+                    background-color: $bg-color;
+                }
+
+                popover {
+                    background-color: $bg-color;
+                    border-radius: 10px;
+                    padding: 0.5rem;
+
+                    box {
+                        border-radius: 10px;
+                        padding: 0.2rem;
+                    }
+                    
+                    box:hover {
+                        background-color: $fg-color;
+                    }
+
+                    .selected {
+                        background-color: $fg-color;
+                    }
+                }
+            }
+
+            .brightness {
+                highlight {
+                    background-color: $brightness-color;
+                }
+            }
+
+            .audio {
+                highlight {
+                    background-color: $volume-color;
+                }
+            }
+
+            .mic {
+                highlight {
+                    background-color: $mic-color;
+                }
+            }
+
+            .disabled {
+                filter: brightness(80%);
             }
         }
     }
@@ -187,9 +272,29 @@ window.Bar {
             }
     
             .body {
-                font-size: 1.5rem;
+                font-size: 1.2rem;
             }
         }
     }
 
 }
+
+scale {
+    margin: 0;
+    padding: 0;
+    trough {
+      border-radius: 10px;
+      background-color: $fg-color;
+      highlight {
+        // background-color: $brightness-color;
+        min-height: 15px;
+        // min-width: 25px;
+        border-radius: 10px;
+      }
+      slider {
+        box-shadow: none;
+        outline: unset;
+        background-color: transparent;
+      }
+    }
+  }
