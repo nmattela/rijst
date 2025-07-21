@@ -58,9 +58,14 @@ export default function Notification({ notification, dismiss }: { notification: 
                         notification.invoke(actionId)
                     }
                 }}
+                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
             >
-                <box>
+                <box
+                    spacing={10}
+                >
                     <image
+                        widthRequest={50}
+                        heightRequest={50}
                         file={notification.image}
                     />
                     <label

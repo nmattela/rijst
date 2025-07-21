@@ -8,57 +8,21 @@ import { execAsync, subprocess } from "ags/process"
 import Brightness from "../utils/Brightness"
 import Wp from "gi://AstalWp"
 import Bluetooth from "gi://AstalBluetooth"
-import { AudioIcon, BatteryIcon, BluetoothIcon, NetworkIcon } from "./SystemTray"
+import { AudioIcon, BatteryIcon, BluetoothIcon, MicrophoneIcon, NetworkIcon } from "./SystemTray"
+import GObject from "gi://GObject?version=2.0"
+import GLib from "gi://GLib"
+import MediaPlayer from "./MediaPlayer"
+import WeatherView from "./WeatherView"
 
 export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
     const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor
 
     const brightness = Brightness.get_default()
-    const wp = Wp.get_default()
-    const bluetooth = Bluetooth.get_default()
 
-    const [speakers, setSpeakers] = createState<Array<Wp.Endpoint>>([])
-    const [microphones, setMicrophones] = createState<Array<Wp.Endpoint>>([])
-    wp?.connect(`endpoint-added`, (_, endpoint) => {
-        if(endpoint.mediaClass === Wp.MediaClass.AUDIO_SPEAKER) {
-            setSpeakers(speakers => [...speakers, endpoint])
-        } else if(endpoint.mediaClass === Wp.MediaClass.AUDIO_MICROPHONE) {
-            setMicrophones(microphones => [...microphones, endpoint])
-        }
+    const [visible, setVisible] = createState(false)
+    app.connect(`window-toggled`, (_, window) => {
+        window.name === `System Menu` ? setVisible(window.visible) : null
     })
-
-    const currentSpeaker = speakers(speakers => {
-        const speaker = speakers.find(speaker => speaker.isDefault)
-        console.log(`ewa`, speakers, speaker)
-        return speaker
-    })
-    const currentMicrophone = microphones(microphones => microphones.find(microphone => microphone.isDefault) ?? wp?.defaultMicrophone)
-
-    console.log(`currents: `, currentSpeaker, currentMicrophone)
-
-    currentSpeaker(console.log)
-
-    // const audio = wp !== null ? createBinding(wp, `audio`) : undefined
-    // const speakers = audio?.as(audio => {
-    //     console.log(audio.speakers)
-    //     return audio.speakers
-    // })
-    // const currentSpeaker = speakers?.as(speakers => speakers.find(speaker => speaker.isDefault))
-
-    const volume = wp !== null ? createBinding(wp.defaultSpeaker, `volume`) : undefined
-    const volumeIcon = wp !== null ? createBinding(wp.defaultSpeaker, `volumeIcon`) : undefined
-    const muted = wp !== null ? createBinding(wp.defaultSpeaker, `mute`) : undefined
-    const audioLabel = muted?.as(muted => muted ? `Unmute` : `Mute`)
-    const audioClass = muted?.as(muted => muted ? `disabled` : ``)
-
-    // const microphones = wp !== null ? createBinding(wp.audio, `microphones`) : undefined
-    // const currentMicrophone = microphones?.as(microphones => microphones.find(microphone => microphone.isDefault))
-
-    const micVolume = wp !== null ? createBinding(wp.defaultMicrophone, `volume`) : undefined
-    const micIcon = wp !== null ? createBinding(wp.defaultMicrophone, `volumeIcon`) : undefined
-    const micMuted = wp !== null ? createBinding(wp.defaultMicrophone, `mute`) : undefined
-    const micLabel = micMuted?.as(muted => muted ? `Unmute` : `Mute`)
-    const micClass = micMuted?.as(muted => muted ? `disabled` : ``)
 
     return (
         <window
@@ -94,115 +58,167 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                     }
                 }}
             />
-            <box
-                orientation={Gtk.Orientation.VERTICAL}
-                spacing={20}
+            <revealer
+                revealChild={visible}
+                transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
             >
                 <box
-                    class="settings"
-                    orientation={Gtk.Orientation.VERTICAL}
-                    spacing={30}
+                    orientation={Gtk.Orientation.HORIZONTAL}
+                    spacing={20}
                 >
-                    <centerbox
-                        $type="start"
-                        class="header"
-                        orientation={Gtk.Orientation.HORIZONTAL}
-                    >
-                        <label
-                            $type="start"
-                            label="Quick Settings"
-                            halign={Gtk.Align.START}
-                        />
-                        <button
-                            $type="end"
-                            label=""
-                            halign={Gtk.Align.END}
-                        >
-                        </button>
-                    </centerbox>
-                    <Gtk.FlowBox
-                        $type="center"
-                        maxChildrenPerLine={3}
-                        activateOnSingleClick={false}
-                        homogeneous
-                        rowSpacing={10}
-                        columnSpacing={10}
-                    >
-                        <NetworkIcon />
-                        <BluetoothIcon />
-                        <AudioIcon />
-                        {/* <SystemPill
-                            icon={`audio-input-microphone`}
-                            label={`Off`}
-                            color={`#5C8984`}
-                        /> */}
-                        <BatteryIcon />
-                        {/* <SystemPill
-                            icon={`accessories-screenshot-tool`}
-                            color={`#fb6f92`}
-                            onClick={() => execAsync([`grimblast`, `copy`, `area`])}
-                        /> */}
-                    </Gtk.FlowBox>
                     <box
-                        $type="end"
-                        class="sliders"
+                        widthRequest={500}
                         orientation={Gtk.Orientation.VERTICAL}
-                        valign={Gtk.Align.END}
-                        spacing={10}
+                        spacing={20}
+                        valign={Gtk.Align.START}
+                    >
+                        <box hexpand>
+                            <WeatherView />
+                        </box>
+                        <box hexpand>
+                            <MediaPlayer />
+                        </box>
+                    </box>
+                    <box
+                        orientation={Gtk.Orientation.VERTICAL}
+                        spacing={20}
                     >
                         <box
-                            class="brightness"
-                            orientation={Gtk.Orientation.HORIZONTAL}
-                            spacing={10}
+                            class="settings"
+                            orientation={Gtk.Orientation.VERTICAL}
+                            spacing={30}
                         >
-                            <image class="icon" iconName={`brightness-symbolic`} />
-                            <slider
-                                value={brightness.screen}
-                                min={0.1}
-                                max={1}
-                                onChangeValue={({ value }) => {
-                                    brightness.screen = value
-                                }}
-                                visible={true}
-                                hexpand
-                                valuePos={Gtk.PositionType.RIGHT}
-                            />
+                            <centerbox
+                                $type="start"
+                                class="header"
+                                orientation={Gtk.Orientation.HORIZONTAL}
+                            >
+                                <label
+                                    $type="start"
+                                    label="Quick Settings"
+                                    halign={Gtk.Align.START}
+                                />
+                                <box
+                                    $type="end"
+                                    orientation={Gtk.Orientation.HORIZONTAL}
+                                    spacing={5}
+                                >
+                                    <button
+                                        class={`icon hover-bg`}
+                                        tooltipText={`Screenshot`}
+                                        iconName={`screenshot-symbolic`}
+                                        onClicked={() => {
+                                            app.get_window(`System Menu`)?.hide()
+                                            execAsync([`grimblast`, `copy`, `area`])
+                                        }}
+                                        cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                                    />
+                                    <button
+                                        class={`icon hover-bg`}
+                                        tooltipText={`Color Picker`}
+                                        iconName={`color-picker-symbolic`}
+                                        onClicked={async () => {
+                                            app.get_window(`System Menu`)?.hide()
+                                            execAsync([`${GLib.getenv(`HOME`)}/.scripts/color-picker`])
+                                        }}
+                                        cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                                    />
+                                </box>
+                            </centerbox>
+                            <Gtk.FlowBox
+                                $type="center"
+                                maxChildrenPerLine={3}
+                                activateOnSingleClick={false}
+                                homogeneous
+                                rowSpacing={10}
+                                columnSpacing={10}
+                            >
+                                <NetworkIcon />
+                                <BluetoothIcon />
+                                <AudioIcon />
+                                <MicrophoneIcon />
+                                <BatteryIcon />
+                                {/* <SystemPill
+                                    icon={`accessories-screenshot-tool`}
+                                    color={`#fb6f92`}
+                                    onClick={() => execAsync([`grimblast`, `copy`, `area`])}
+                                /> */}
+                            </Gtk.FlowBox>
+                            <box
+                                $type="end"
+                                class="sliders"
+                                orientation={Gtk.Orientation.VERTICAL}
+                                valign={Gtk.Align.END}
+                                spacing={10}
+                            >
+                                {
+                                    brightness.screen !== 0 && (
+                                        <box
+                                            class="brightness"
+                                            orientation={Gtk.Orientation.HORIZONTAL}
+                                            spacing={10}
+                                        >
+                                            <image class="icon" iconName={`brightness-symbolic`} />
+                                            <slider
+                                                value={brightness.screen}
+                                                min={0.1}
+                                                max={1}
+                                                onChangeValue={({ value }) => {
+                                                    brightness.screen = value
+                                                }}
+                                                visible={true}
+                                                hexpand
+                                                valuePos={Gtk.PositionType.RIGHT}
+                                            />
+                                        </box>
+                                    )
+                                }
+                                <AudioDeviceSlider
+                                    type="audio"
+                                />
+                                <AudioDeviceSlider
+                                    type="mic"
+                                />
+                            </box>
                         </box>
-                        <AudioDeviceSlider
-                            speakers={speakers}
-                            type="audio"
-                        />
-                        <AudioDeviceSlider
-                            speakers={microphones}
-                            type="mic"
-                        />
+                        <scrolledwindow
+                            heightRequest={500}
+                        >
+                            <Notifications />
+                        </scrolledwindow>
                     </box>
                 </box>
-                <scrolledwindow
-                    heightRequest={500}
-                >
-                    <Notifications />
-                </scrolledwindow>
-            </box>
+            </revealer>
         </window>
     )
 }
 
-function AudioDeviceSlider({ speakers, type }: { speakers: Accessor<Array<Wp.Endpoint>>, type: `audio` | `mic` }) {
-    
-    const currentSpeaker = speakers(speakers => speakers.find(speaker => speaker.isDefault))
-    const speakerName = currentSpeaker(currentSpeaker => {
-        console.log(`speakerName: `, currentSpeaker, currentSpeaker?.name)
-        return currentSpeaker?.name ?? ``
+function AudioDeviceSlider({ type }: { type: `audio` | `mic` }) {
+
+    const wp = Wp.get_default()
+
+    const [speakers, setSpeakers] = createState<Array<Wp.Endpoint>>([])
+    const [currentSpeaker, setCurrentSpeaker] = createState<Wp.Endpoint>(type === `audio` ? wp.defaultSpeaker : wp.defaultMicrophone)
+    wp.connect(`ready`, () => {
+        if(type === `audio`) {
+            setSpeakers(wp.audio.speakers)
+            setCurrentSpeaker(wp.audio.speakers.find(speaker => speaker.isDefault) ?? wp.defaultSpeaker)
+        } else {
+            setSpeakers(wp.audio.microphones)
+            setCurrentSpeaker(wp.audio.microphones.find(microphone => microphone.isDefault) ?? wp.defaultMicrophone)
+        }
     })
 
+    wp.connect(`notify`, () => {
+        setCurrentSpeaker(type === `audio` ? wp.defaultSpeaker : wp.defaultMicrophone)
+    })
+
+    const speakerName = currentSpeaker(currentSpeaker => currentSpeaker?.name ?? `Unnamed Device`)
     const volume = currentSpeaker(currentSpeaker => currentSpeaker?.volume ?? 0)
     const volumeIcon = currentSpeaker(currentSpeaker => currentSpeaker?.volumeIcon ?? ``)
     const muted = currentSpeaker(currentSpeaker => currentSpeaker?.mute ?? true)
     const audioLabel = muted(muted => muted ? `Unmute` : `Mute`)
     const audioClass = muted(muted => muted ? `disabled` : ``)
-
-    console.log(currentSpeaker)
     
     return (
         <box
@@ -220,17 +236,28 @@ function AudioDeviceSlider({ speakers, type }: { speakers: Accessor<Array<Wp.End
                         spacing={5}
                         cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
                     >
-                        <label label={speakerName} />
+                        <label
+                            label={speakerName}
+                            ellipsize={Pango.EllipsizeMode.END}
+                        />
                         <image iconName={`go-down`} />
                     </box>
                     <popover>
-                        <For each={speakers} id={speaker => speaker.id}>
-                            {speaker => (
-                                <box class={speaker.isDefault ? `selected` : undefined}>
-                                    {speaker.name}
-                                </box>
-                            )}
-                        </For>
+                        <box
+                            orientation={Gtk.Orientation.VERTICAL}
+                            spacing={5}
+                        >
+                            <For each={speakers}>
+                                {(speaker) => (
+                                    <button
+                                        class={`menu-item ${speaker.isDefault ? `selected` : undefined}`}
+                                        cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                                        onClicked={() => speaker.set_is_default(true)}
+                                        label={speaker.name ?? `Unnamed Device`}
+                                    />
+                                )}
+                            </For>
+                        </box>
                     </popover>
             </menubutton>
             <box
@@ -243,7 +270,7 @@ function AudioDeviceSlider({ speakers, type }: { speakers: Accessor<Array<Wp.End
                     cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
                     tooltipText={audioLabel}
                     onClicked={() => {
-                        currentSpeaker(currentSpeaker => currentSpeaker?.set_mute(!muted))
+                        currentSpeaker.get().set_mute(!muted.get())
                     }}
                 >
                     <image iconName={volumeIcon} />
@@ -254,12 +281,12 @@ function AudioDeviceSlider({ speakers, type }: { speakers: Accessor<Array<Wp.End
                     min={0}
                     max={1}
                     onChangeValue={({ value }) => {
-                        currentSpeaker(currentSpeaker => currentSpeaker?.set_volume(value))
+                        currentSpeaker.get().set_volume(value)
                     }}
                     visible={true}
                     hexpand
                     valuePos={Gtk.PositionType.RIGHT}
-
+                    cursor={Gdk.Cursor.new_from_name(`ew-resize`, null)}
                 />
             </box>
         </box>

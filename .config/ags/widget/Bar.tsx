@@ -1,10 +1,10 @@
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 // import Astal from "ags/gtk4/astal"
-import { createBinding, createState, For, With } from "ags"
+import { Accessor, createBinding, createState, For, With } from "ags"
 import Workspaces from "./Workspaces"
 import SystemTray from "./SystemTray"
-import Power from "./Power"
+import { PowerButton } from "./Power"
 import SystemMenu from "./SystemMenu"
 import { createPoll } from "ags/time"
 import GLib from "gi://GLib?version=2.0"
@@ -38,8 +38,8 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                 <centerbox>
                     <Workspaces $type="start" />
                     <button
-                        class="clock"
                         $type={"center"}
+                        class="clock"
                     >
                         <label label={time} />
                     </button>
@@ -49,7 +49,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                         spacing={150}
                     >
                         <SystemTray />
-                        <Power />
+                        <PowerButton />
                     </box>
                     {/* {
                         showSystemMenu(showSystemMenu => {

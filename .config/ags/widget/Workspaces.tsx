@@ -21,7 +21,7 @@ export default function Workspaces() {
             <For each={workspaces} id={([_, i]) => i}>
                 {([ws, i]) => (
                     <button
-                        class={focusedWorkspace.as(focusedWorkspace => `workspace ${ws !== undefined ? `workspace-used` : ``} ${ws === focusedWorkspace ? `workspace-focused` : ``}`)}
+                        class={focusedWorkspace.as(focusedWorkspace => `workspace ${ws !== undefined ? `workspace-used` : ``} ${(i+1) === focusedWorkspace.id ? `workspace-focused` : ``}`)}
                         onClicked={() => (
                             ws !== undefined
                                 ? ws.focus()

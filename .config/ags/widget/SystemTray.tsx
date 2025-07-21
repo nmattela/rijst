@@ -1,5 +1,5 @@
-import { Gdk, Gtk } from "ags/gtk4"
-import { Accessor, createBinding, createState, With } from "ags"
+import { Astal, Gdk, Gtk } from "ags/gtk4"
+import { Accessor, createBinding, createComputed, createState, With } from "ags"
 import Network from "gi://AstalNetwork"
 import Bluetooth from "gi://AstalBluetooth"
 import Wp from "gi://AstalWp"
@@ -11,6 +11,7 @@ import SystemMenu from "./SystemMenu"
 import Notification from "./Notification"
 import { execAsync } from "ags/process"
 import Pango from "gi://Pango"
+import sequence from "../utils/sequence"
 
 const apps = new Apps.Apps({
   nameMultiplier: 2,
@@ -43,38 +44,57 @@ export default function SystemTray() {
 
 export function NetworkIcon({ small = false }: { small?: boolean }) {
     const network = Network.get_default()
-    const wifi = createBinding(network, `wifi`)
-    const wired = createBinding(network, `wired`)
-    const isWifi = createBinding(network, `get_wifi`).as(v => v !== null).get()
-    const isWired = createBinding(network, `get_wired`).as(v => v !== null).get()
 
-    const icon = createBinding(network, `wifi`).as(wifi => createBinding(network, `wired`).as(wired => {
-        if(wifi !== null) {
-            return (
-                <image
-                    tooltipText={wifi.ssid}
-                    class="icon network network-connected"
-                    iconName={wifi.iconName}
-                />
-            )
-        } else if(isWired) {
-            return (
-                <image
-                    tooltipText={wired.speed.toString()}
-                    class="icon network network-connected"
-                    iconName={wired.iconName}
-                />
-            )
-        } else {
-            return (
-                <image
-                    tooltipText="Not connected"
-                    class="icon network"
-                    iconName={`network-wireless`}
-                />
-            )
+    const primary = createBinding(network, `primary`)
+    const connected = primary.as(primary => primary !== Network.Primary.UNKNOWN)
+    const label = primary.as(primary => {
+        switch(primary) {
+            case Network.Primary.WIRED: return network.wired.device.activeConnection.id
+            case Network.Primary.WIFI: return network.wifi.ssid
+            default: return `Not connected`
         }
-    }))
+    })
+    const icon = primary.as(primary => {
+        switch(primary) {
+            case Network.Primary.WIRED: return network.wired.iconName
+            case Network.Primary.WIFI: return network.wifi.iconName
+            default: return `network-offline`
+        }
+    })
+    const className = primary.as(primary => {
+        switch(primary) {
+            case Network.Primary.UNKNOWN: `icon network`
+            default: return `icon network network-connected`
+        }
+    })
+
+    // const icon = createBinding(network, `wifi`).as(wifi => createBinding(network, `wired`).as(wired => {
+    //     if(wifi !== null) {
+    //         return (
+    //             <image
+    //                 tooltipText={wifi.ssid}
+    //                 class="icon network network-connected"
+    //                 iconName={wifi.iconName}
+    //             />
+    //         )
+    //     } else if(wired !== null) {
+    //         return (
+    //             <image
+    //                 tooltipText={wired.speed.toString()}
+    //                 class="icon network network-connected"
+    //                 iconName={wired.iconName}
+    //             />
+    //         )
+    //     } else {
+    //         return (
+    //             <image
+    //                 tooltipText="Not connected"
+    //                 class="icon network"
+    //                 iconName={`network-wireless`}
+    //             />
+    //         )
+    //     }
+    // }))
 
     if(small) {
         return (
@@ -83,18 +103,21 @@ export function NetworkIcon({ small = false }: { small?: boolean }) {
                 onClicked={() => apps.fuzzy_query("nmtui").at(0)?.launch()}
                 cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
             >
-                <With value={icon}>
-                    {(icon) => icon.get()}
-                </With>
+                <image
+                    tooltipText={label}
+                    class={className}
+                    iconName={icon}
+                />
             </button>
         )
     } else {
         return (
             <SystemPill
-                icon={`network-wireless`}
-                label={`Klarrio Guest`}
+                icon={icon}
+                label={label}
                 color={`#FAAB78`}
                 onClick={() => execAsync([`kitty`, `nmtui`])}
+                active={connected}
             />
         )
     }
@@ -147,6 +170,7 @@ export function BluetoothIcon({ small = false }: { small?: boolean }) {
                         label={bluetoothLabel}
                         color={`#0083fc`}
                         onClick={() => execAsync(`blueberry`)}
+                        active={isPowered}
                     />
                 )).get()}
             </With>
@@ -163,82 +187,96 @@ export function AudioIcon({ small = false }: { small?: boolean }) {
     const volumeIcon = audio !== null ? createBinding(audio.defaultSpeaker, `volumeIcon`) : undefined
     const muted = audio !== null ? createBinding(audio.defaultSpeaker, `mute`) : undefined
 
+    const label = createComputed([volume ?? new Accessor(() => undefined), muted ?? new Accessor(() => undefined)]).as(([volume, muted]) => muted ? `Muted` : `${Math.round((volume ?? 0) * 100)}%`)
+    // const label = sequence({ volume: volume ?? new Accessor(() => undefined), muted: muted ?? new Accessor(() => undefined) }).as(({ volume, muted }) => muted ? `Muted` : `${Math.round((volume ?? 0) * 100)}%`)
+
+    const name = createBinding(audio.defaultSpeaker, `name`)
+    const tooltipText = (label ?? new Accessor(() => undefined)).as(label => (name ?? new Accessor(() => undefined)).as(name => `${name}${label !== undefined ? `- ${label}` : ``}`).get())
+
+    const className = muted?.(muted => audio === null || defaultSpeaker === undefined
+        ? `icon audio`
+        : `icon audio ${!muted ? `audio-enabled` : ``}`
+    )
+
+    if(small) {
+        return (
+            <button
+                tooltipText={tooltipText}
+                class={className}
+                widthRequest={30}
+                onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
+                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+            >
+                <image
+                    iconName={volumeIcon}
+                />
+            </button>
+        )
+    } else {
+        return (
+            <With value={muted ?? new Accessor(() => false)}>
+                {muted => (
+                    <SystemPill
+                        icon={volumeIcon ?? ``}
+                        label={label}
+                        color={`#5C8984`}
+                        onClick={() => execAsync(`pavucontrol`)}
+                        active={!muted}
+                    />
+                )}
+            </With>
+        )
+    }
+}
+
+export function MicrophoneIcon({ small = false }: { small?: boolean }) {
+    const audio = Wp.get_default()
+    const defaultMicrophone = audio?.audio.defaultMicrophone
+
+    const volume = audio !== null ? createBinding(audio.defaultMicrophone, `volume`) : undefined
+    const volumeIcon = audio !== null ? createBinding(audio.defaultMicrophone, `volumeIcon`) : undefined
+    const muted = audio !== null ? createBinding(audio.defaultMicrophone, `mute`) : undefined
+
     const label = volume?.as(volume => muted?.as(muted => muted ? `Muted` : `${Math.round(volume * 100)}%`).get() ?? ``)
 
-    const tooltipText = audio === null || defaultSpeaker === undefined
-        ? `No audio device found`
-        : `${defaultSpeaker.name} - ${defaultSpeaker.volume}%`
+    const tooltipText = audio === null || defaultMicrophone === undefined
+        ? `No microphone found`
+        : `${defaultMicrophone.name} - ${defaultMicrophone.volume}%`
 
-    const className = audio === null || defaultSpeaker === undefined
-        ? `icon audio`
-        : `icon audio ${!defaultSpeaker.mute ? `audio-enabled` : ``}`
+    const className = muted?.(muted => audio === null || defaultMicrophone === undefined
+        ? `icon micro`
+        : `icon micro ${!muted ? `micro-enabled` : ``}`
+    )
 
-        if(small) {
-            return (
-                <button
-                    tooltipText={tooltipText}
-                    class={className}
-                    widthRequest={30}
-                    onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
-                    cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                >
-                    <image
-                        iconName={volumeIcon}
-                    />
-                </button>
-            )
-        } else {
-            return (
-                <SystemPill
-                    icon={volumeIcon ?? ``}
-                    label={label}
-                    color={`#5C8984`}
-                    onClick={() => execAsync(`pavucontrol`)}
+    if(small) {
+        return (
+            <button
+                tooltipText={tooltipText}
+                class={className}
+                widthRequest={30}
+                onClicked={() => execAsync(`pavucontrol`)}
+                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+            >
+                <image
+                    iconName={volumeIcon}
                 />
-            )
-        }
-    
-
-    // if(audio === null) {
-    //     return (
-    //         <button
-    //             tooltipText={`No audio device found`}
-    //             class={`icon audio`}
-    //             widthRequest={30}
-    //             onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
-    //         >
-    //             
-    //         </button>
-    //     )
-    // } else {        
-    //     const defaultSpeaker = createBinding(audio, `audio`).as(audio => audio.get_default_speaker())
-    //     return defaultSpeaker.as(defaultSpeaker => {
-    //         if(defaultSpeaker === null) {
-    //             return (
-    //                 <button
-    //                     tooltipText={`No audio device found`}
-    //                     class={`icon audio`}
-    //                     onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
-    //                 >
-    //                     
-    //                 </button>
-    //             )
-    //         } else {
-    //             return (
-    //                 <button
-    //                     tooltipText={defaultSpeaker !== null ? `${defaultSpeaker.name} - ${defaultSpeaker.volume}%` : `No audio device found`}
-    //                     class={`icon audio ${!defaultSpeaker.mute ? `audio-enabled` : ``}`}
-    //                     onClicked={() => apps.fuzzy_query("pavucontrol").at(0)?.launch()}
-    //                 >
-    //                     <label
-    //                         label={defaultSpeaker.volumeIcon}
-    //                     />
-    //                 </button>
-    //             )
-    //         }
-    //     })
-    // }
-
+            </button>
+        )
+    } else {
+        return (
+            <With value={muted ?? new Accessor(() => false)}>
+                {muted => (
+                    <SystemPill
+                        icon={volumeIcon ?? ``}
+                        label={label}
+                        color={`#B5B682`}
+                        onClick={() => execAsync(`pavucontrol`)}
+                        active={!muted}
+                    />
+                )}
+            </With>
+        )
+    }
 }
 
 export function BatteryIcon({ small = false }: { small?: boolean }) {
@@ -246,6 +284,12 @@ export function BatteryIcon({ small = false }: { small?: boolean }) {
 
     const iconName = createBinding(battery, `iconName`)
     const label = createBinding(battery, `batteryLevel`).as(b => `${b*100}%${battery.charging ? ` - Charging` : ``}`)
+
+    if(!battery.isPresent) {
+        return (
+            <></>
+        )
+    }
 
     if(small) {
         return (
@@ -313,12 +357,12 @@ function ExpandButton() {
 }
 
 
-function SystemPill({ icon, label, color, onClick }: { icon: string | Accessor<string>, label?: string | Accessor<string>, color: string, onClick?: () => void }) {
+function SystemPill({ icon, label, color, onClick, active = false }: { icon: string | Accessor<string>, label?: string | Accessor<string>, color: string, onClick?: () => void, active?: boolean | Accessor<boolean> }) {
 
     return (
         <button
             class={`pill ${onClick !== undefined ? `clickable` : ``}`}
-            css={`background: ${color};`}
+            css={active ? `background: ${color};` : undefined}
             widthRequest={120}
             heightRequest={60}
             cursor={onClick !== undefined ? Gdk.Cursor.new_from_name(`pointer`, null) : undefined}

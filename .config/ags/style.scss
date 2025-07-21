@@ -106,7 +106,7 @@ window.Bar {
     }
 }
 
-.Power {
+.PowerButton {
     padding: 0.5rem;
 
     >button {
@@ -114,6 +114,47 @@ window.Bar {
         background-color: $power-color;
         border-radius: 10000px;
         margin: 4px 10px;
+    }
+
+    .icon:hover {
+        background-color: $power-color;
+        filter: brightness(90%);
+    }
+}
+
+.Power {
+    
+    >box {
+        padding: 1rem;
+        margin: 40rem 75rem;
+        border-radius: 10px;
+        background-color: rgba($bg-color, 0.5);
+
+        >button {
+            border-radius: 10px;
+            font-size: 1.5rem;
+        }
+
+        >button:hover {
+            filter: brightness(90%);
+            font-size: 3rem;
+        }
+
+        .shutdown {
+            background-color: $power-color;
+        }
+
+        .reboot {
+            background-color: $power-reboot-color;
+        }
+
+        .lock {
+            background-color: $power-lock-color;
+        }
+
+        .logout {
+            background-color: $power-logout-color;
+        }
     }
 }
 
@@ -205,12 +246,12 @@ window.Bar {
                     border-radius: 10px;
                     padding: 0.5rem;
 
-                    box {
+                    .menu-item {
                         border-radius: 10px;
                         padding: 0.2rem;
                     }
                     
-                    box:hover {
+                    .menu-item:hover {
                         background-color: $fg-color;
                     }
 
@@ -258,43 +299,134 @@ window.Bar {
                 background-color: $fg-color;
                 padding: 1rem;
             }
+
+            .clear-button:hover {
+                background-color: $bg-color;
+            }
         }
+    }    
+}
 
-        .notification {
-            border-radius: 10px;
-            padding: 1rem;
-            background-color: $bg-color;
+.notification {
+    border-radius: 10px;
+    padding: 1rem;
+    background-color: $bg-color;
 
-            .header {
-                .summary {
-                    font-style: italic;
-                }
-            }
-    
-            .body {
-                font-size: 1.2rem;
-            }
+    .header {
+        .summary {
+            font-style: italic;
         }
     }
 
+    .body {
+        font-size: 1.2rem;
+    }
+}
+
+.MediaPlayer {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), $bg-color;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50%;
+
+    border-radius: 10px;
+    padding: 1rem;
+
+    .description {
+        .title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .artist {
+        }
+    }
+
+    .controls {
+        .playback, .player-selection {
+            >button {
+                padding: 0.3rem;
+                border-radius: 1000px;
+            }
+    
+            >button:hover {
+                filter: brightness(60%);
+            }
+
+            .disabled {
+                color: $fg-color
+            }
+        }
+    
+        .slider {
+            margin: 0 1rem;
+    
+            trough {
+                background-color: rgba($fg-color, 0.8); 
+            }
+            highlight {
+                min-height: 5px;
+                background-color: white;
+            }
+        }
+    }
+}
+
+.Weather {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50%;
+
+    border-radius: 10px;
+    padding: 1rem;
+
+    .temperature {
+        font-weight: bold;
+        font-size: 1.6rem;
+    }
+}
+
+.PushNotification {
+    .countdown {
+        min-height: 5px;
+
+        trough {
+            background-color: transparent;
+        }
+    }
 }
 
 scale {
     margin: 0;
     padding: 0;
     trough {
-      border-radius: 10px;
-      background-color: $fg-color;
-      highlight {
-        // background-color: $brightness-color;
-        min-height: 15px;
-        // min-width: 25px;
         border-radius: 10px;
-      }
-      slider {
-        box-shadow: none;
-        outline: unset;
-        background-color: transparent;
-      }
+        background-color: $fg-color;
+        highlight {
+            // background-color: $brightness-color;
+            min-height: 15px;
+            // min-width: 25px;
+            border-radius: 10px;
+        }
+        slider {
+            box-shadow: none;
+            outline: unset;
+            background-color: transparent;
+        }
     }
-  }
+}
+
+levelbar {
+    margin: 0;
+    padding: 0;
+    min-height: 15px;
+    trough {
+        border-radius: 10px;
+        background-color: $fg-color;
+
+        .filled {
+            background-color: white;
+            border-radius: 10px;
+        }
+    }
+}
