@@ -70,12 +70,28 @@ const Weather = GObject.registerClass({
             `A fitting background image`,
             GObject.ParamFlags.READABLE,
             `/weather_image`
+        ),
+        copyright: GObject.ParamSpec.string(
+            `copyright`,
+            `Image Copyright`,
+            `The copyright holder of the background image`,
+            GObject.ParamFlags.READABLE,
+            ``
+        ),
+        source: GObject.ParamSpec.string(
+            `source`,
+            `Image source`,
+            `A URL linking to the source of the image with its copyright holder`,
+            GObject.ParamFlags.READABLE,
+            ``
         )
     },
     Signals: {
         info: {},
         icon: {},
         image: {},
+        copyright: {},
+        source: {},
     }
 }, class Weather extends GObject.Object {
 
@@ -108,10 +124,17 @@ const Weather = GObject.registerClass({
         const weawowBody = await weawowResponse.json()
 
         const imageUrl = weawowBody.c.z.d
-        console.log(imageUrl)
+        const copyright = weawowBody.c.z.c
+        const source = weawowBody.c.z.b
 
         await execAsync([`wget`, `--quiet`, `--output-document`, `/tmp/weather_image`, imageUrl])
         this.notify(`image`)
+        
+        this.#copyright = copyright
+        this.notify(`copyright`)
+
+        this.#source = source
+        this.notify(`source`)
     }
 
     #info: WeatherInfo | undefined
@@ -126,6 +149,17 @@ const Weather = GObject.registerClass({
 
     get image() {
         return `file:///tmp/weather_image`
+    }
+
+    #copyright: string = ``
+
+    get copyright() {
+        return this.#copyright
+    }
+
+    #source: string = ``
+    get source() {
+        return this.#source
     }
 
     constructor(key: string, location: string, unit: `metric` | `imperial` = `metric`) {

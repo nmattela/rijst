@@ -33,7 +33,6 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
             application={app}
             anchor={TOP | RIGHT}
             gdkmonitor={gdkmonitor}
-            visible={true}
             widthRequest={400}
             marginTop={20}
             marginRight={100}
@@ -195,23 +194,23 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
 
 function AudioDeviceSlider({ type }: { type: `audio` | `mic` }) {
 
-    const wp = Wp.get_default()
+    const wp = Wp.get_default()!
 
     const [speakers, setSpeakers] = createState<Array<Wp.Endpoint>>([])
     const [currentSpeaker, setCurrentSpeaker] = createState<Wp.Endpoint>(type === `audio` ? wp.defaultSpeaker : wp.defaultMicrophone)
-    wp.connect(`ready`, () => {
-        if(type === `audio`) {
-            setSpeakers(wp.audio.speakers)
-            setCurrentSpeaker(wp.audio.speakers.find(speaker => speaker.isDefault) ?? wp.defaultSpeaker)
-        } else {
-            setSpeakers(wp.audio.microphones)
-            setCurrentSpeaker(wp.audio.microphones.find(microphone => microphone.isDefault) ?? wp.defaultMicrophone)
-        }
-    })
+    // wp.connect(`ready`, () => {
+    //     if(type === `audio`) {
+    //         setSpeakers(wp.audio.speakers)
+    //         setCurrentSpeaker(wp.audio.speakers.find(speaker => speaker.isDefault) ?? wp.defaultSpeaker)
+    //     } else {
+    //         setSpeakers(wp.audio.microphones)
+    //         setCurrentSpeaker(wp.audio.microphones.find(microphone => microphone.isDefault) ?? wp.defaultMicrophone)
+    //     }
+    // })
 
-    wp.connect(`notify`, () => {
-        setCurrentSpeaker(type === `audio` ? wp.defaultSpeaker : wp.defaultMicrophone)
-    })
+    // wp.connect(`notify`, () => {
+    //     setCurrentSpeaker(type === `audio` ? wp.defaultSpeaker : wp.defaultMicrophone)
+    // })
 
     const speakerName = currentSpeaker(currentSpeaker => currentSpeaker?.name ?? `Unnamed Device`)
     const volume = currentSpeaker(currentSpeaker => currentSpeaker?.volume ?? 0)

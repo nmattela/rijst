@@ -126,9 +126,10 @@ window.Bar {
     
     >box {
         padding: 1rem;
-        margin: 40rem 75rem;
+        // margin: 40rem 40rem;
+        // margin: 40rem 50rem;
         border-radius: 10px;
-        background-color: rgba($bg-color, 0.5);
+        background-color: rgba($bg-color, 0.9);
 
         >button {
             border-radius: 10px;
@@ -137,7 +138,7 @@ window.Bar {
 
         >button:hover {
             filter: brightness(90%);
-            font-size: 3rem;
+            // font-size: 3rem;
         }
 
         .shutdown {
@@ -383,6 +384,10 @@ window.Bar {
     .temperature {
         font-weight: bold;
         font-size: 1.6rem;
+    }
+
+    .copyright:hover {
+        text-decoration: underline;
     }
 }
 

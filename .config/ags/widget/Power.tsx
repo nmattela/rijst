@@ -25,10 +25,10 @@ export function Power(gdkmonitor: Gdk.Monitor) {
         <window
             class={`Power`}
             name={`Power`}
-            layer={Astal.Layer.TOP}
+            layer={Astal.Layer.OVERLAY}
             keymode={Astal.Keymode.EXCLUSIVE}
             application={app}
-            visible={true}
+            // visible={true}
             anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT | Astal.WindowAnchor.BOTTOM | Astal.WindowAnchor.LEFT}
             gdkmonitor={gdkmonitor}
             widthRequest={0}
@@ -46,6 +46,10 @@ export function Power(gdkmonitor: Gdk.Monitor) {
                 spacing={10}
                 hexpand={false}
                 vexpand={false}
+                widthRequest={300}
+                heightRequest={300}
+                halign={Gtk.Align.CENTER}
+                valign={Gtk.Align.CENTER}
             >
                 <button
                     class="shutdown"
@@ -82,4 +86,4 @@ export function Power(gdkmonitor: Gdk.Monitor) {
             </box>
         </window>
     )
-}
+}   
