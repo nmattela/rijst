@@ -1,6 +1,6 @@
 import Hyprland from "gi://AstalHyprland"
 import app from "ags/gtk4/app"
-import { Gtk } from "ags/gtk4"
+import { Gdk, Gtk } from "ags/gtk4"
 import { Accessor, createBinding, For, With } from "ags"
 import Apps from "gi://AstalApps"
 
@@ -17,9 +17,6 @@ export default function Workspaces() {
         [workspaces.find(workspace => workspace.id === i+1), i]
     ))
     const focusedWorkspace = createBinding(hyprland, `focusedWorkspace`)
-
-    const focusedWorkspaceIcons: Accessor<Array<[string, boolean]>> = focusedWorkspace.as(focusedWorkspace => focusedWorkspace.clients.map(client => [apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`, !client.hidden]))
-
 
     return (
         <box
@@ -45,6 +42,7 @@ export default function Workspaces() {
                             widthRequest={28}
                             heightRequest={28}
                             valign={Gtk.Align.CENTER}
+                            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
                         >
                             <With value={focusedWorkspace}>
                                 {focusedWorkspace => (

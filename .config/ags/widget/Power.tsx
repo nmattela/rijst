@@ -57,7 +57,7 @@ export function Power(gdkmonitor: Gdk.Monitor) {
                     heightRequest={300}
                     iconName={`system-shutdown`}
                     cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                    onClicked={() => execAsync(`shutdown`)}
+                    onClicked={() => execAsync(`shutdown -h now`).catch(console.log)}
                 />
                 <button
                     class="reboot"
@@ -86,4 +86,4 @@ export function Power(gdkmonitor: Gdk.Monitor) {
             </box>
         </window>
     )
-}   
+}

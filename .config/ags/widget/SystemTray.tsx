@@ -11,7 +11,6 @@ import SystemMenu from "./SystemMenu"
 import Notification from "./Notification"
 import { execAsync } from "ags/process"
 import Pango from "gi://Pango"
-import sequence from "../utils/sequence"
 
 const apps = new Apps.Apps({
   nameMultiplier: 2,

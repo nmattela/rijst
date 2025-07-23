@@ -5,14 +5,27 @@ import SystemMenu from "./widget/SystemMenu"
 import GLib from "gi://GLib"
 import PushNotification from "./widget/PushNotification"
 import { Power } from "./widget/Power"
+import AppLauncher from "./widget/AppLauncher"
 
 app.start({
     css: style,
     icons: `${GLib.getenv(`HOME`)}/.config/ags/icons`,
     main() {
-        app.get_monitors().map(Bar)
-        app.get_monitors().map(SystemMenu)
-        app.get_monitors().map(PushNotification)
-        app.get_monitors().map(Power)
+
+        const monitor = app.get_monitors().find(m => m.connector === `DP-3`)
+
+        if(monitor !== undefined) {
+            Bar(monitor)
+            SystemMenu(monitor)
+            PushNotification(monitor)
+            Power(monitor)
+            AppLauncher(monitor)
+        }
+
+        // app.get_monitors().map(Bar)
+        // app.get_monitors().map(SystemMenu)
+        // app.get_monitors().map(PushNotification)
+        // app.get_monitors().map(Power)
+        // app.get_monitors().map(AppLauncher)
     },
 })

@@ -36,22 +36,32 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                 visible={true}
             >
                 <centerbox>
-                    <box
+                    <centerbox
                         $type="start"
-                        orientation={Gtk.Orientation.HORIZONTAL}
-                        spacing={10}
                     >
-                        <button
-                            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                        <box
+                            $type="start"
+                            orientation={Gtk.Orientation.HORIZONTAL}
+                            spacing={10}
                         >
-                            <image
-                                iconName={`launcher-symbolic`}
-                                iconSize={Gtk.IconSize.LARGE}
-                                pixelSize={30}
-                            />
-                        </button>
-                        <Workspaces />
-                    </box>
+                            <button
+                                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                                onClicked={() => app.toggle_window(`App Launcher`)}
+                            >
+                                <image
+                                    iconName={`launcher-symbolic`}
+                                    iconSize={Gtk.IconSize.LARGE}
+                                    pixelSize={30}
+                                />
+                            </button>
+                            <Workspaces />
+                        </box>
+                        <box
+                            $type="end"
+                        >
+                            <label label={`hi!`} />
+                        </box>
+                    </centerbox>
                     <button
                         $type={"center"}
                         class="clock"
