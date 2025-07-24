@@ -480,6 +480,34 @@ window.Bar {
     }
 }
 
+.Metrics {
+    .gauge {
+        min-height: 5px;
+    }
+
+    .memory {
+        .filled {
+            background-color: $memory-color;
+        }
+    }
+
+    .cpu {
+        .filled {
+            background-color: $cpu-color;
+        }
+    }
+
+    .disk {
+        .filled {
+            background-color: $disk-color;
+        }
+    }
+
+    label {
+        font-size: 0.75rem;
+    }
+}
+
 scale {
     margin: 0;
     padding: 0;

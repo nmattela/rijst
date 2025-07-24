@@ -10,6 +10,7 @@ import { createPoll } from "ags/time"
 import GLib from "gi://GLib?version=2.0"
 import Notifd from "gi://AstalNotifd"
 import Notification from "./Notification"
+import Metrics from "./Metrics"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 
@@ -38,6 +39,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                 <centerbox>
                     <centerbox
                         $type="start"
+                        hexpand
                     >
                         <box
                             $type="start"
@@ -59,7 +61,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                         <box
                             $type="end"
                         >
-                            <label label={`hi!`} />
+                            <Metrics/>
                         </box>
                     </centerbox>
                     <button
