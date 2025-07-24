@@ -1,5 +1,5 @@
 import { Astal, Gdk, Gtk } from "ags/gtk4"
-import { Accessor, createBinding, createComputed, createState, With } from "ags"
+import { Accessor, createBinding, createComputed, createState, For, With } from "ags"
 import Network from "gi://AstalNetwork"
 import Bluetooth from "gi://AstalBluetooth"
 import Wp from "gi://AstalWp"
@@ -18,9 +18,12 @@ const apps = new Apps.Apps({
   executableMultiplier: 2,
 })
 
-const tray = Tray.get_default()
 
 export default function SystemTray() {
+    
+    const tray = Tray.get_default()
+
+    const trayItems = createBinding(tray, `items`).as(items => items.filter(item => item.title !== ``))
 
     return (
         <box
@@ -29,14 +32,20 @@ export default function SystemTray() {
             halign={Gtk.Align.START}
             spacing={5}
         >
-            <NetworkIcon small />
-            <BluetoothIcon small />
-            <AudioIcon small />
-            <BatteryIcon small />
-            {
-                tray.get_items().map(item => <TrayIcon item={item}></TrayIcon>)
-            }
-            <ExpandButton />
+            <box>
+                <For each={trayItems}>
+                {trayItem => (
+                        <TrayIcon
+                            item={trayItem}
+                        />
+                )} 
+                </For>
+            </box>
+            <box><NetworkIcon small /></box>
+            <box><BluetoothIcon small /></box>
+            <box><AudioIcon small /></box>
+            <box><BatteryIcon small /></box>
+            <box><ExpandButton /></box>
         </box>
     )
 }
@@ -179,7 +188,7 @@ export function BluetoothIcon({ small = false }: { small?: boolean }) {
 }
 
 export function AudioIcon({ small = false }: { small?: boolean }) {
-    const audio = Wp.get_default()
+    const audio = Wp.get_default()!
     const defaultSpeaker = audio?.audio.defaultSpeaker
 
     const volume = audio !== null ? createBinding(audio.defaultSpeaker, `volume`) : undefined
@@ -318,9 +327,13 @@ function TrayIcon({ item }: { item: Tray.TrayItem }) {
     return (
         <button
             class={`icon`}
-        >
-            { item.title }
-        </button>
+            iconName={item.iconName}
+            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+            tooltipText={item.title}
+            onClicked={() => item.activate(0, 0)}
+            label={item.iconName === `` ? item.title.at(0)?.toUpperCase() : undefined}
+            tooltipMarkup={item.tooltipMarkup}
+        />
     )
 }
 
