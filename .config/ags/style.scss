@@ -30,41 +30,41 @@ $memory-color: #cce8cc;
 $disk-color: #fec89a;
 
 $selected-color: #db4b4b;
-$border-color: #9ece6a;
+$page-color: #9ece6a;
 
-// background:			rgba(0, 0, 0, 0.3);
-// bordercolor:                     rgba(0,43,54,0);
-// separatorcolor:                  rgba(0,0,0,0);
-// normal-background:               rgba(253,246,227,0);
-// normal-foreground:               #ffffff;
-// //alternate-normal-foreground:     rgba(255,0,0,0.22745098039215686);
-// selected-normal-background:      rgba(196,171,28,0);
-// selected-normal-foreground:      #f2c01c;
-// active-background:               rgba(253,246,227,0/*.5137254901960784*/);
-// active-foreground:               rgba(255, 255, 255, 1);
-// //alternate-active-background:     rgba(255,77,79,0.35294117647058826);
-// selected-active-background:      rgba(38,139,210,0);
-// selected-active-foreground:      #ffbb00;
-// urgent-background:               rgba(253,246,227,0);
-// urgent-foreground:               #dc322f;
-// alternate-urgent-background:     @urgent-background;//rgba(238,232,213,0);
-// selected-urgent-background:      rgba(220,50,47,0);
-// selected-urgent-foreground:      #ff0004;
-// alternate-normal-foreground:     @normal-foreground;
-// alternate-urgent-foreground:     @urgent-foreground;
-// alternate-active-foreground:     @active-foreground;
-// alternative-active-background:   @active-background;
-// foreground:                      @normal-foreground;
+// $background:			rgba(0, 0, 0, 0.3);
+// $bordercolor:                     rgba(0,43,54,0);
+// $separatorcolor:                  rgba(0,0,0,0);
+// $normal-background:               rgba(253,246,227,0);
+// $normal-foreground:               #ffffff;
+// //$alternate-normal-foreground:     rgba(255,0,0,0.22745098039215686);
+// $selected-normal-background:      rgba(196,171,28,0);
+// $selected-normal-foreground:      #f2c01c;
+// $active-background:               rgba(253,246,227,0/*.5137254901960784*/);
+// $active-foreground:               rgba(255, 255, 255, 1);
+// //$alternate-active-background:     rgba(255,77,79,0.35294117647058826);
+// $selected-active-background:      rgba(38,139,210,0);
+// $selected-active-foreground:      #ffbb00;
+// $urgent-background:               rgba(253,246,227,0);
+// $urgent-foreground:               #dc322f;
+// $alternate-urgent-background:     @urgent-background;//rgba(238,232,213,0);
+// $selected-urgent-background:      rgba(220,50,47,0);
+// $selected-urgent-foreground:      #ff0004;
+// $alternate-normal-foreground:     @normal-foreground;
+// $alternate-urgent-foreground:     @urgent-foreground;
+// $alternate-active-foreground:     @active-foreground;
+// $alternative-active-background:   @active-background;
+// $foreground:                      @normal-foreground;
 
-// background: #1A1B26;
-// background-alt: argb:00202124;
-// background-bar: #C0CAF5;
-// foreground: #c0caf5;
-// foreground-alt: #a9b1d6;
-// accent: #44475a;
-// border: #9ece6a;
-// selected: #292E42;
-// red: #db4b4b;
+// $background: #1A1B26;
+// // $background-alt: argb:00202124;
+// $background-bar: #C0CAF5;
+// $foreground: #c0caf5;
+// $foreground-alt: #a9b1d6;
+// $accent: #44475a;
+// $border: #9ece6a;
+// $selected: #292E42;
+// $red: #db4b4b;
 
 * {
     all: unset;
@@ -455,7 +455,13 @@ window.Bar {
             .search-icon {
                 padding: 1rem;
                 background-color: $cpu-color;
-                border-radius: 10px;
+                border-radius: 10px 0 0 10px;
+            }
+
+            >entry {
+                padding: 0.5rem;
+                border-radius: 0 10px 10px 0;
+                background-color: $bg-color;
             }
         }
 
@@ -474,8 +480,21 @@ window.Bar {
             background-color: $bg-color;
         }
 
-        .app:focus {
+        .app-focus {
             background-color: $selected-color;
+        }
+
+        .app-focus:hover {
+            background-color: $selected-color;
+            filter: brightness(80%);
+        }
+
+        .page {
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0.5rem 2rem;
+            border-radius: 10px;
+            background-color: $page-color;
         }
     }
 }
