@@ -35,7 +35,7 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
             class={`PushNotification`}
             name={`Push Notification`}
             layer={Astal.Layer.OVERLAY}
-            keymode={Astal.Keymode.ON_DEMAND}
+            keymode={Astal.Keymode.NONE}
             application={app}
             visible={notification.as(notification => notification !== undefined)}
             anchor={TOP | RIGHT}

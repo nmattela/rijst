@@ -10,7 +10,7 @@ import { createPoll } from "ags/time"
 import GLib from "gi://GLib?version=2.0"
 import Notifd from "gi://AstalNotifd"
 import Notification from "./Notification"
-import Metrics from "./Metrics"
+import Desktop from "./Desktop"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 
@@ -37,33 +37,24 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                 visible={true}
             >
                 <centerbox>
-                    <centerbox
+                    <box
                         $type="start"
                         hexpand
+                        orientation={Gtk.Orientation.HORIZONTAL}
+                        spacing={10}
                     >
-                        <box
-                            $type="start"
-                            orientation={Gtk.Orientation.HORIZONTAL}
-                            spacing={10}
+                        <button
+                            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                            onClicked={() => app.toggle_window(`App Launcher`)}
                         >
-                            <button
-                                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                                onClicked={() => app.toggle_window(`App Launcher`)}
-                            >
-                                <image
-                                    iconName={`launcher-symbolic`}
-                                    iconSize={Gtk.IconSize.LARGE}
-                                    pixelSize={30}
-                                />
-                            </button>
-                            <Workspaces />
-                        </box>
-                        <box
-                            $type="end"
-                        >
-                            <Metrics/>
-                        </box>
-                    </centerbox>
+                            <image
+                                iconName={`launcher-symbolic`}
+                                iconSize={Gtk.IconSize.LARGE}
+                                pixelSize={30}
+                            />
+                        </button>
+                        <Workspaces />
+                    </box>
                     <button
                         $type={"center"}
                         class="clock"

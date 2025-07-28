@@ -6,6 +6,7 @@ import GLib from "gi://GLib"
 import PushNotification from "./widget/PushNotification"
 import { Power } from "./widget/Power"
 import AppLauncher from "./widget/AppLauncher"
+import Desktop from "./widget/Desktop"
 
 app.start({
     css: style,
@@ -20,6 +21,7 @@ app.start({
             PushNotification(monitor)
             Power(monitor)
             AppLauncher(monitor)
+            Desktop(monitor)
         }
 
         // app.get_monitors().map(Bar)
