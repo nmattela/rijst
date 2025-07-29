@@ -1,7 +1,7 @@
 import Hyprland from "gi://AstalHyprland"
 import app from "ags/gtk4/app"
 import { Gdk, Gtk } from "ags/gtk4"
-import { Accessor, createBinding, For, With } from "ags"
+import { Accessor, createBinding, createComputed, For, With } from "ags"
 import Apps from "gi://AstalApps"
 
 const apps = new Apps.Apps({
@@ -18,34 +18,40 @@ export default function Workspaces() {
     ))
     const focusedWorkspace = createBinding(hyprland, `focusedWorkspace`)
 
+    const clients = createBinding(hyprland, `clients`)
+
+    const computed = createComputed([focusedWorkspace, clients])
+
     return (
-        <box
-            class="Workspaces"
-            valign={Gtk.Align.CENTER}
-            halign={Gtk.Align.START}
-            spacing={10}
-        >
-            <For each={workspaces} id={([_, i]) => i}>
-                {([ws, i]) => {
+        <With value={computed}>
+            {([focusedWorkspace, clients]) => (
+                <box
+                    class="Workspaces"
+                    valign={Gtk.Align.CENTER}
+                    halign={Gtk.Align.START}
+                    spacing={10}
+                >
+                    <For each={workspaces}>
+                        {([ws, i]) => {
 
-                    const icons = ws?.clients.map<[string, boolean]>(client => [apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`, !client.hidden]) ?? []
-                    const currentIcon = icons.filter(([_, main]) => main)
+                            const workspaceClients = clients.filter(c => c.workspace.id === ws?.id)
 
-                    return (
-                        <button
-                            class={focusedWorkspace.as(focusedWorkspace => `workspace ${ws !== undefined ? `workspace-used` : ``} ${(i + 1) === focusedWorkspace.id ? `workspace-focused` : ``}`)}
-                            onClicked={() => (
-                                ws !== undefined
-                                    ? ws.focus()
-                                    : hyprland.dispatch(`workspace`, `${i + 1}`)
-                            )}
-                            widthRequest={28}
-                            heightRequest={28}
-                            valign={Gtk.Align.CENTER}
-                            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                        >
-                            <With value={focusedWorkspace}>
-                                {focusedWorkspace => (
+                            const icons = workspaceClients.map<[string, boolean]>(client => [apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`, !client.hidden]) ?? []
+                            const currentIcon = icons.filter(([_, main]) => main)
+
+                            return (
+                                <button
+                                    class={`workspace ${ws !== undefined ? `workspace-used` : ``} ${(i + 1) === focusedWorkspace.id ? `workspace-focused` : ``}`}
+                                    onClicked={() => (
+                                        ws !== undefined
+                                            ? ws.focus()
+                                            : hyprland.dispatch(`workspace`, `${i + 1}`)
+                                    )}
+                                    widthRequest={28}
+                                    heightRequest={28}
+                                    valign={Gtk.Align.CENTER}
+                                    cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+                                >
                                     <box
                                         orientation={Gtk.Orientation.HORIZONTAL}
                                         spacing={5}
@@ -60,12 +66,12 @@ export default function Workspaces() {
                                             ))
                                         }  
                                     </box>
-                                )}
-                            </With>
-                        </button>
-                    )
-                }}
-            </For>
-        </box>
+                                </button>
+                            )
+                        }}
+                    </For>
+                </box>
+            )}
+        </With>
     )
 }

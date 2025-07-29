@@ -20,46 +20,56 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
     const totalPages = apps.as(apps => Math.ceil(apps.length / 12))
     const [inputFocused, setInputFocused] = createState(true)
     const [focusedItem, setFocusedItem] = createState<number>(0)
+
     const [searchBox, setSearchBox] = createState<Gtk.FlowBox | undefined>(undefined)
     
     focusedItem.subscribe(() => setPage(Math.floor((focusedItem.get() ?? 0) / 12)))
+    search.subscribe(() => setFocusedItem(0))
 
     const appsPage = createComputed([apps, page, focusedItem])
     const pageTotalPages = createComputed([page, totalPages])
 
-    const onNavigate = (direction: Gtk.DirectionType) => setFocusedItem(i => {
-        const newI = (() => {
-            if(direction === Gtk.DirectionType.DOWN) {
-                if((i%12) >= 8) {
-                    return i
-                } else {
-                    return i + 4
+    const onNavigate = (direction: Gtk.DirectionType) => {
+        const [newFocusedItem, newInputFocused] = ((i: number) => {
+            const [newI, newInputFocused] = (() => {
+                if(direction === Gtk.DirectionType.DOWN) {
+                    if((i%12) >= 8) {
+                        return [i, false]
+                    } else {
+                        return [i + 4, false]
+                    }
                 }
-            }
-            if(direction === Gtk.DirectionType.LEFT) {
-                return i - 1
-            }
-            if(direction === Gtk.DirectionType.UP) {
-                if((i%12) < 4) {
-                    setInputFocused(true)
-                    return 0
-                } else {
-                    return i-4
+                if(direction === Gtk.DirectionType.LEFT) {
+                    return [i - 1, false]
                 }
+                if(direction === Gtk.DirectionType.UP) {
+                    if((i%12) < 4) {
+                        return [i, true]
+                    } else {
+                        return [i-4, false]
+                    }
+                }
+                if(direction === Gtk.DirectionType.RIGHT) {
+                    return [i+1, false]
+                }
+                
+                return [i, false]
+            })()
+    
+            if(newI < 0) {
+                return [apps.get().length + newI, newInputFocused]
+            } else {
+                return [newI % apps.get().length, newInputFocused]
             }
-            if(direction === Gtk.DirectionType.RIGHT) {
-                return i+1
-            }
-            
-            return i
-        })()
+        })(focusedItem.get())
 
-        if(newI < 0) {
-            return apps.get().length + newI
-        } else {
-            return newI % apps.get().length
-        }
-    })
+        console.log(newFocusedItem, newInputFocused)
+
+        setFocusedItem(newFocusedItem)
+        setInputFocused(newInputFocused)
+    }
+
+    inputFocused.subscribe(() => console.log(inputFocused.get()))
 
     return (
         <window
@@ -83,9 +93,6 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                 onKeyPressed={({ widget }, keyval) => {
                     if(keyval === Gdk.KEY_Escape) {
                         widget.hide()
-                    } else if(keyval === Gdk.KEY_Return) {
-                        apps.get().at(focusedItem.get())?.launch()
-                        widget.hide()
                     }
                 }}
             />
@@ -107,25 +114,33 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                             iconName={`system-search`}
                         />
                         <label
-                            label={`Search`}
+                            label={`Search Apps`}
                         />
                     </box>
-                    <entry
-                        text={search}
-                        onNotifyText={({ text }) => setSearch(text)}
-                        vexpand
-                        hexpand
-                        canFocus={inputFocused}
-                    >
-                        <Gtk.EventControllerKey
-                            onKeyPressed={({ widget }, keyval) => {
-                                if(keyval === Gdk.KEY_Down) {
-                                    searchBox.get()?.grab_focus()
-                                    setInputFocused(false)
-                                }
-                            }}
-                        />
-                    </entry>
+                    <With value={inputFocused}>
+                        {inputFocused => (
+                            <entry
+                                text={search}
+                                onNotifyText={({ text }) => setSearch(text)}
+                                vexpand
+                                hexpand
+                                canFocus={inputFocused}
+                                focusOnClick
+                                onActivate={() => {
+                                    apps.get().at(focusedItem.get())?.launch()
+                                    app.toggle_window(`App Launcher`)
+                                }}
+                            >
+                                <Gtk.EventControllerKey
+                                    onKeyPressed={({ widget }, keyval) => {
+                                        if(keyval === Gdk.KEY_Down) {
+                                            onNavigate(Gtk.DirectionType.DOWN)
+                                        }
+                                    }}
+                                />
+                            </entry>
+                        )}
+                    </With>
                 </box>
                 <box>
                     <With value={appsPage}>
@@ -135,7 +150,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                 rowSpacing={10}
                                 columnSpacing={10}
                                 focusable
-                                $={(self) => setSearchBox(self)}
+                                canFocus={inputFocused.as(i => !i)}
                             >
                                 <Gtk.EventControllerKey
                                     onKeyPressed={(_, keyval) => {
