@@ -4,6 +4,7 @@ import app from "ags/gtk4/app";
 import Apps from "gi://AstalApps"
 import { pad } from "../utils/utils";
 import Pango from "gi://Pango?version=1.0";
+import GObject from "gi://GObject?version=2.0";
 
 const appsClient = new Apps.Apps({
   nameMultiplier: 2,
@@ -20,8 +21,6 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
     const totalPages = apps.as(apps => Math.ceil(apps.length / 12))
     const [inputFocused, setInputFocused] = createState(true)
     const [focusedItem, setFocusedItem] = createState<number>(0)
-
-    const [searchBox, setSearchBox] = createState<Gtk.FlowBox | undefined>(undefined)
     
     focusedItem.subscribe(() => setPage(Math.floor((focusedItem.get() ?? 0) / 12)))
     search.subscribe(() => setFocusedItem(0))
@@ -67,6 +66,13 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
 
         setFocusedItem(newFocusedItem)
         setInputFocused(newInputFocused)
+    }
+
+    const launch = () => {
+        apps.get().at(focusedItem.get())?.launch()
+        setSearch(``)
+        setFocusedItem(0)
+        app.toggle_window(`App Launcher`)
     }
 
     inputFocused.subscribe(() => console.log(inputFocused.get()))
@@ -126,10 +132,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                 hexpand
                                 canFocus={inputFocused}
                                 focusOnClick
-                                onActivate={() => {
-                                    apps.get().at(focusedItem.get())?.launch()
-                                    app.toggle_window(`App Launcher`)
-                                }}
+                                onActivate={launch}
                             >
                                 <Gtk.EventControllerKey
                                     onKeyPressed={({ widget }, keyval) => {
@@ -171,8 +174,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                         if(direction !== undefined) {
                                             onNavigate(direction)
                                         } else if(keyval === Gdk.KEY_Return) {
-                                            apps.at(focusedItem ?? 0)?.launch()
-                                            app.toggle_window(`App Launcher`)
+                                            launch()
                                         }
                                     }}
                                 />

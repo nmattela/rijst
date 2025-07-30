@@ -19,6 +19,9 @@ $unused-workspaces: #5e81ac;
 $used-workspaces: $wifi-color;
 $active-workspaces: $bluetooth-color;
 
+$active-app: #006fd1;
+// $active-app-hover: #005fb3;
+
 $temperature-color: #ffd6a5;
 $rain-color: #90dbf4;
 
@@ -144,8 +147,52 @@ window.Bar {
     }
     
     .workspace-focused {
+        padding: 0rem;
         background-color: $active-workspaces;
     }
+
+    .workspace-focused:hover {
+        filter: unset;
+    }
+
+    .workspace-focused-app {
+        background-color: $active-workspaces;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0;
+    }
+
+    .workspace-focused-app:hover {
+        background-color: $active-app;
+    }
+
+    .workspace-focused-app:first-child {
+        border-top-left-radius: 100px;
+        border-bottom-left-radius: 100px;
+    }
+
+    .workspace-focused-app:last-child {
+        border-top-right-radius: 100px;
+        border-bottom-right-radius: 100px;
+    }
+
+    .workspace-focused-app-focused {
+        background-color: $active-app;
+    }
+
+    .workspace-focused-app-focused:hover {
+        filter: brightness(90%);
+    }
+    
+    .workspace-focused-app-image {
+        padding: 0.25rem;
+    }
+
+    // .workspace-focused-app {
+    //     // background-color: $active-workspaces;
+    //     border: 1px solid white;
+    //     border-radius: 100px;
+    //     padding: 0.2rem;
+    // }
 }
 
 .PowerButton {
