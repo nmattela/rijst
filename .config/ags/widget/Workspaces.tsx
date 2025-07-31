@@ -42,8 +42,6 @@ export default function Workspaces() {
                             const currentIcon = icons.filter(([client]) => !client.hidden)
                             const isFocused = (i + 1) === focusedWorkspace.id
 
-                            console.log(`Is Workspace ${i} focused?: `, isFocused)
-
                             const iconsView = (
                                 <box
                                     class={isFocused ? `workspace-focused-apps` : ``}

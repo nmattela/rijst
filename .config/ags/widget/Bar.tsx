@@ -11,10 +11,16 @@ import GLib from "gi://GLib?version=2.0"
 import Notifd from "gi://AstalNotifd"
 import Notification from "./Notification"
 import Desktop from "./Desktop"
+import Hyprland from "gi://AstalHyprland"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 
     const notifd = Notifd.get_default()
+    const hyprland = Hyprland.get_default()
+
+    const focusedClient: Accessor<Hyprland.Client | null> = createBinding(hyprland, `focusedClient`)
+
+    focusedClient.subscribe(() => console.log(`focused client: `, focusedClient.get()))
 
     const [notifications, setNotifications] = createState<Array<Notifd.Notification>>([])
     notifd.connect(`notified`, (_, id) => {
@@ -28,7 +34,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
     return (
         <>
             <window
-                class="Bar"
+                class={focusedClient.as(focusedClient => `Bar ${focusedClient !== null ? `BarFocused` : ``}`)}
                 name={`Bar`}
                 gdkmonitor={gdkmonitor}
                 exclusivity={Astal.Exclusivity.EXCLUSIVE}

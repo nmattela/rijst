@@ -1,7 +1,7 @@
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import Notification from "./Notification";
-import { createState, With } from "ags";
+import { createState, For, With } from "ags";
 import Notifd from "gi://AstalNotifd"
 import { interval, timeout } from "ags/time";
 
@@ -10,34 +10,40 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
 
     const notifd = Notifd.get_default()
 
-    const [notification, setNotification] = createState<Notifd.Notification | undefined>(undefined)
-    const [countdown, setCountdown] = createState(0)
-    
-    notifd.connect(`notified`, (_, id) => {
-        console.log(`notified!`)
+    const [notifications, setNotifications] = createState<Array<{ notification: Notifd.Notification, countdown: number }>>([])
+
+    notifd.connect(`notified`, (_, id) =>  {
         if(!app.get_window(`System Menu`)?.visible) {
             const notification = notifd.get_notification(id)
-            setNotification(notification)
-            setCountdown(5000)
+            setNotifications(notifications => [...notifications, { notification, countdown: 5000 }])
             const counter = interval(16, () => {
-                if(countdown.get() <= 0) {
-                    setNotification(undefined)
+                const index = notifications.get().findIndex(({ notification }) => notification.id === id)
+                if(index === -1) {
+                    console.log(`not found, canceling`)
                     counter.cancel()
                 } else {
-                    setCountdown(countdown => countdown - 16)
+                    const { notification, countdown } = notifications.get()[index]
+                    if(countdown <= 0) {
+                        setNotifications(notifications => [...notifications.slice(0, index), ...notifications.slice(index + 1)])
+                        counter.cancel()
+                    } else {
+                        setNotifications(notifications => notifications.with(index, { notification, countdown: countdown - 16 }))
+                    }
                 }
             })
         }
     })
+
+    notifications.subscribe(() => console.log(notifications.get()))
 
     return (
         <window
             class={`PushNotification`}
             name={`Push Notification`}
             layer={Astal.Layer.OVERLAY}
-            keymode={Astal.Keymode.NONE}
+            keymode={Astal.Keymode.ON_DEMAND}
             application={app}
-            visible={notification.as(notification => notification !== undefined)}
+            visible={notifications.as(notifications => notifications.length > 0)}
             anchor={TOP | RIGHT}
             gdkmonitor={gdkmonitor}
             widthRequest={350}
@@ -45,29 +51,32 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
             marginTop={20}
             marginRight={150}
         >
-            <revealer
-                revealChild={notification.as(notification => notification !== undefined)}
-                transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
+            <box
+                orientation={Gtk.Orientation.VERTICAL}
+                spacing={10}
             >
-                <With value={notification}>
-                    {notification => notification !== undefined && (
-                        <box
-                            orientation={Gtk.Orientation.VERTICAL}
-                            spacing={5}
+                <For each={notifications}>
+                    {({ notification, countdown }, i) => (
+                        <revealer
+                            revealChild
+                            transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
                         >
-                            <Notification
-                                notification={notification}
-                                dismiss={() => null}
-                            />
-                            <levelbar
-                                class="countdown"
-                                value={countdown.as(countdown => countdown / 5000)}
-                                hexpand
-                            />
-                        </box>
+                            <box
+                                orientation={Gtk.Orientation.VERTICAL}
+                                spacing={5}
+                            >
+                                <Notification
+                                    notification={notification}
+                                    dismiss={() => setNotifications(notifications => [...notifications.slice(0, i.get()), ...notifications.slice(i.get() + 1)])} />
+                                <levelbar
+                                    class="countdown"
+                                    value={countdown / 5000}
+                                    hexpand />
+                            </box>
+                        </revealer>
                     )}
-                </With>
-            </revealer>
+                </For>
+            </box>
         </window>
     )
 }
