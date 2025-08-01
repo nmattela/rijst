@@ -16,7 +16,8 @@ const appsClient = new Apps.Apps({
 export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
 
     const [search, setSearch] = createState(``)
-    const apps = search.as(search => appsClient.fuzzy_query(search))
+    const [apps, setApps] = createState<Array<Apps.Application>>(appsClient.list)
+    search.subscribe(() => setApps(appsClient.exact_query(search.get())))
     const [page, setPage] = createState(0)
     const totalPages = apps.as(apps => Math.ceil(apps.length / 12))
     const [inputFocused, setInputFocused] = createState(true)
@@ -62,10 +63,14 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
             }
         })(focusedItem.get())
 
-        console.log(newFocusedItem, newInputFocused)
-
         setFocusedItem(newFocusedItem)
         setInputFocused(newInputFocused)
+    }
+
+    const close = () => {
+        setSearch(``)
+        setFocusedItem(0)
+        app.get_window(`App Launcher`)?.hide()
     }
 
     const launch = () => {
@@ -74,8 +79,6 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
         setFocusedItem(0)
         app.toggle_window(`App Launcher`)
     }
-
-    inputFocused.subscribe(() => console.log(inputFocused.get()))
 
     return (
         <window
@@ -98,7 +101,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
             <Gtk.EventControllerKey
                 onKeyPressed={({ widget }, keyval) => {
                     if(keyval === Gdk.KEY_Escape) {
-                        widget.hide()
+                        close()
                     }
                 }}
             />

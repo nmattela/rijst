@@ -96,7 +96,6 @@ const Weather = GObject.registerClass({
 }, class Weather extends GObject.Object {
 
     async fetch(key: string, location: string, unit: `metric` | `imperial` = `metric`) {
-        console.log(`interval`)
         // console.log(`https://api.openweathermap.org/data/2.5/weather?APPID=${key}&q=Antwerp&units=${unit}`)
         // const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?APPID=7e6ed49a1a7b802ad1299faa3a5f008d&q=Antwerp&units=metric`)
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?APPID=${key}&q=${location}&units=${unit}`)
@@ -164,12 +163,11 @@ const Weather = GObject.registerClass({
 
     constructor(key: string, location: string, unit: `metric` | `imperial` = `metric`) {
         super();
-        console.log(`yop`)
 
         this.fetch(key, location, unit)
         setInterval(async () => {
             await this.fetch(key, location, unit)
-        }, 1000 * 60)
+        }, 1000 * 60 * 10)
 
     }
 })

@@ -138,8 +138,6 @@ window.BarFocused {
         background-color: $unused-workspaces;
 
         padding: 0.5rem;
-        border: none;
-        font-size: 1rem;
     }
 
     .workspace:hover {
@@ -148,33 +146,33 @@ window.BarFocused {
     
     .workspace-used {
         background-color: $used-workspaces;
+        padding: 0.5rem;
     }
-    
-    .workspace-focused {
-        padding: 0rem;
-        background-color: $active-workspaces;
+
+    .workspace-used:hover {
+        filter: brightness(90%);
     }
 
     .workspace-focused:hover {
         filter: unset;
     }
 
-    .workspace-focused-app {
+    .workspace-focused {
         background-color: $active-workspaces;
-        padding: 0.25rem 0.5rem;
+        padding: 0.5rem;
         border-radius: 0;
     }
 
-    .workspace-focused-app:hover {
+    .workspace-focused:hover {
         background-color: $active-app;
     }
 
-    .workspace-focused-app:first-child {
+    .workspace-focused:first-child {
         border-top-left-radius: 100px;
         border-bottom-left-radius: 100px;
     }
 
-    .workspace-focused-app:last-child {
+    .workspace-focused:last-child {
         border-top-right-radius: 100px;
         border-bottom-right-radius: 100px;
     }
@@ -185,10 +183,6 @@ window.BarFocused {
 
     .workspace-focused-app-focused:hover {
         filter: brightness(90%);
-    }
-    
-    .workspace-focused-app-image {
-        padding: 0.25rem;
     }
 
     // .workspace-focused-app {
