@@ -34,56 +34,85 @@ export default function Workspaces() {
                     spacing={10}
                 >
                     <For each={workspaces}>
-                        {([ws, i]) => {
-
-                            const workspaceClients = clients.filter(c => c.workspace.id === ws?.id)
-
-                            const icons = workspaceClients.map<[Hyprland.Client, string, number]>(client => [client, apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`, i]) ?? []
-                            const currentIcon = icons.filter(([client]) => !client.hidden)
-                            const isFocused = (i + 1) === focusedWorkspace.id
-
-                            const shownClients: Array<[Hyprland.Client | undefined, string, number]> = icons.length === 0 ? [[undefined, ``, i]] : isFocused ? icons : currentIcon
-
-                            // console.log(`workspace ${i+1}`, shownClients)
-                            // console.log(`workspace ${i+1} is ${ws !== undefined ? `not ` : ``}undefined. Focused workspace is ${focusedWorkspace.id}. isFocus?: ${isFocused}`)
-
-                            // console.log(`Workspace ${i+1}, focused is ${isFocused}: workspace ${isFocused ? `workspace-focused` : icons.length > 0 ? `workspace-used` : ``}`)
-
-                            return (
-                                <box
-                                    orientation={Gtk.Orientation.HORIZONTAL}
-                                    spacing={0}
-                                    heightRequest={28}
-                                >
-                                    {
-                                        shownClients.map(([client, icon]) => (
-                                            <button
-                                                class={`workspace ${isFocused ? `workspace-focused` : client !== undefined ? `workspace-used` : ``} ${focusedClient?.address === client?.address ? `workspace-focused-app-focused` : ``}`}
-                                                onClicked={
-                                                    isFocused && client !== undefined
-                                                        ? () => client.focus()
-                                                        : () => (
-                                                            ws !== undefined
-                                                                ? ws.focus()
-                                                                : hyprland.dispatch(`workspace`, `${i + 1}`)
-                                                        )
-                                                }
-                                                cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                                                tooltipText={isFocused && client !== undefined ? client.title : `Workspace ${i + 1} - ${workspaceClients.length} window${workspaceClients.length !== 1 ? `s` : ``} open`}
-                                                valign={Gtk.Align.CENTER}
-                                                widthRequest={28}
-                                                heightRequest={28}
-                                                iconName={icon}
-                                            >
-                                            </button>
-                                        ))
-                                    }
-                                </box>
-                            )
-                        }}
+                        {([workspace, i]) => (
+                            <WorkspaceButton
+                                workspace={workspace}
+                                index={i}
+                                clients={clients.filter(c => c.workspace.id === workspace?.id)}
+                                focusedClient={focusedClient ?? undefined}
+                                isWorkspaceFocused={(i + 1) === focusedWorkspace.id}
+                                onClick={() => (
+                                    workspace !== undefined
+                                        ? workspace.focus()
+                                        : hyprland.dispatch(`workspace`, `${i + 1}`)
+                                )}
+                            />
+                        )}
                     </For>
                 </box>
             )}
         </With>
+    )
+}
+
+function WorkspaceButton({ workspace, index, isWorkspaceFocused, focusedClient, clients, onClick }: { workspace: Hyprland.Workspace | undefined, index: number, isWorkspaceFocused: boolean, focusedClient?: Hyprland.Client, clients: Array<Hyprland.Client>, onClick: () => void }) {
+
+    const icons = clients.map<[Hyprland.Client, string]>(client => [client, apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`]) ?? []
+    const currentIcon = icons.filter(([client]) => !client.hidden)
+
+    const shownClients: Array<[Hyprland.Client | undefined, string]> = isWorkspaceFocused ? icons : currentIcon
+
+    return (
+        <box
+            orientation={Gtk.Orientation.HORIZONTAL}
+            spacing={0}
+            heightRequest={28}
+            tooltipText={!isWorkspaceFocused || clients.length === 0 ? `Workspace ${workspace?.name ?? index+1} - ${clients.length} window${clients.length !== 1 ? `s` : ``} open` : undefined}
+        >
+            {
+                clients.length > 0
+                    ? shownClients.map(([client, icon]) => (
+                        <WorkspaceClientButton
+                            client={client}
+                            icon={icon}
+                            isClientFocused={focusedClient?.address === client?.address}
+                            isWorkspaceFocused={isWorkspaceFocused}
+                            onClick={(
+                                isWorkspaceFocused && client !== undefined
+                                    ? () => client.focus()
+                                    : onClick
+                            )}
+                        />
+                    ))
+                    : (
+                        <box
+                            orientation={Gtk.Orientation.HORIZONTAL}
+                            spacing={0}
+                            heightRequest={28}
+                        >
+                            <WorkspaceClientButton
+                                isWorkspaceFocused={isWorkspaceFocused}
+                                onClick={onClick}    
+                            />
+                        </box>
+                    )
+            }
+        </box>
+    )
+}
+
+function WorkspaceClientButton({ isWorkspaceFocused, client, isClientFocused, icon, onClick }: { isWorkspaceFocused: boolean, client?: Hyprland.Client, isClientFocused?: boolean, icon?: string, onClick: () => void }) {
+    return (
+        <button
+            class={`workspace ${isWorkspaceFocused ? `workspace-focused` : client !== undefined ? `workspace-used` : ``} ${isClientFocused ? `workspace-focused-app-focused` : ``}`}
+            onClicked={onClick}
+            cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
+            tooltipText={isWorkspaceFocused && client !== undefined ? client.title : undefined}
+            valign={Gtk.Align.CENTER}
+            widthRequest={28}
+            heightRequest={28}
+            iconName={icon}
+        >
+        </button>
     )
 }

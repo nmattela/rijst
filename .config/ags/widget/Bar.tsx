@@ -18,9 +18,9 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
     const notifd = Notifd.get_default()
     const hyprland = Hyprland.get_default()
 
-    const focusedClient: Accessor<Hyprland.Client | null> = createBinding(hyprland, `focusedClient`)
-
-    focusedClient.subscribe(() => console.log(`focused client: `, focusedClient.get()))
+    const focusedClient: Accessor<Hyprland.Client | null> = createBinding(hyprland, `focusedClient`).as(focusedClient =>
+        focusedClient?.monitor.name === gdkmonitor.connector ? focusedClient : null
+    )
 
     const [notifications, setNotifications] = createState<Array<Notifd.Notification>>([])
     notifd.connect(`notified`, (_, id) => {

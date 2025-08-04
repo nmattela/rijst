@@ -3,7 +3,7 @@ import Weather from "../utils/Weather";
 import { Gdk, Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 
-export default function WeatherView() {
+export default function WeatherView({ shade }: { shade?: boolean }) {
     const weather = new Weather(`7e6ed49a1a7b802ad1299faa3a5f008d`, `Antwerp`)
 
     const info = createBinding(weather, `info`)
@@ -16,11 +16,11 @@ export default function WeatherView() {
             {image => (
                 <centerbox
                     hexpand
-                    // widthRequest={500}
+                    // widthRequest={600}
                     heightRequest={300}
                     // widthRequest={300}
                     class="Weather"
-                    css={`background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)), url(${image});`}
+                    css={shade !== undefined ? `background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)), url(${image});` : `background-image: url(${image})`}
                     orientation={Gtk.Orientation.VERTICAL}
                 >
                     <centerbox

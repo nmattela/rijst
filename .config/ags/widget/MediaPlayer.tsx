@@ -10,9 +10,6 @@ export default function MediaPlayer() {
     
     const mpris = Mpris.get_default()
 
-    mpris.connect(`notify::players`, () => console.log(`notify::players`))
-    mpris.connect(`notify`, () => console.log(`notify`))
-
     const players = createPoll([], 500, () => mpris.players) //createBinding(mpris, `players`)
     const [currentPlayerIndex, setCurrentPlayerIndex] = createState<number | undefined>(undefined)
     const [currentPlayer, setCurrentPlayer] = createState(players.get().at(0))
@@ -69,17 +66,18 @@ export default function MediaPlayer() {
                             >
                                 <label
                                     class="title"
-                                    maxWidthChars={50}
+                                    maxWidthChars={30}
                                     ellipsize={Pango.EllipsizeMode.END}
                                     label={currentPlayer?.title}
                                     halign={Gtk.Align.START} />
                                 {currentPlayer?.artist !== undefined && currentPlayer.artist !== `` && (
                                     <label
                                         class="artist"
-                                        maxWidthChars={50}
+                                        maxWidthChars={30}
                                         ellipsize={Pango.EllipsizeMode.END}
                                         label={currentPlayer.artist}
-                                        halign={Gtk.Align.START} />
+                                        halign={Gtk.Align.START}
+                                    />
                                 )}
                             </box>
                             <box

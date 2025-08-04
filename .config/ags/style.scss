@@ -72,6 +72,7 @@ $page-color: #9ece6a;
 * {
     all: unset;
     transition: 200ms ease-out;
+    font-family: Gotham;
 }
 
 window.Bar {
@@ -99,7 +100,8 @@ window.Bar {
 }
 
 window.BarFocused {
-    background: rgba($bg2-color, 0.6);
+    background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)), rgba($bg2-color, 0.6);
+    // background: rgba($bg2-color, 0.6);
 }
 
 .bg {
@@ -546,6 +548,39 @@ window.BarFocused {
 
 .Desktop {
     padding: 10rem;
+
+    .greet {
+        background-color: rgba($bg-color, 0.8);
+        border-radius: 10px;
+        // transition: 2s ease-in-out;
+        // transition-delay: 5s;
+        
+        .title {
+            background-color: rgba($bg2-color, 0.8);
+
+            padding: 1rem;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 1.5rem;
+
+            .profile-picture {
+                border-radius: 1000px;
+            }
+        }
+
+        .body {
+            font-size:  3rem;
+            padding: 5rem 2rem;
+
+            .day {
+                color: $day-color;
+            }
+
+            .date {
+                color: $date-color;
+            }
+        }
+    }
 }
 
 .Metrics {

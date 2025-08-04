@@ -1,3 +1,6 @@
+import { execAsync } from "ags/process"
+import GLib from "gi://GLib?version=2.0"
+
 export function pad<T>(array: Array<T>, size: number): Array<T | undefined> {
     const currLength = array.length
     const missing = size - currLength
@@ -9,4 +12,8 @@ export function pad<T>(array: Array<T>, size: number): Array<T | undefined> {
     } else {
         return array.slice(0, size)
     }
+}
+
+export async function playSound(soundName: 'startup') {
+    execAsync(`cvlc --no-repeat --play-and-exit ${GLib.getenv(`HOME`)}/.config/ags/sounds/${soundName}.mp3`)
 }

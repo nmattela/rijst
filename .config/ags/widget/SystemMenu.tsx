@@ -66,15 +66,15 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                     spacing={20}
                 >
                     <box
-                        widthRequest={500}
+                        widthRequest={300}
                         orientation={Gtk.Orientation.VERTICAL}
                         spacing={20}
                         valign={Gtk.Align.START}
                     >
-                        <box hexpand>
-                            <WeatherView />
+                        <box>
+                            <WeatherView shade />
                         </box>
-                        <box hexpand>
+                        <box>
                             <MediaPlayer />
                         </box>
                     </box>

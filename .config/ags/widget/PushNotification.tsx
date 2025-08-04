@@ -19,7 +19,6 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
             const counter = interval(16, () => {
                 const index = notifications.get().findIndex(({ notification }) => notification.id === id)
                 if(index === -1) {
-                    console.log(`not found, canceling`)
                     counter.cancel()
                 } else {
                     const { notification, countdown } = notifications.get()[index]
@@ -33,8 +32,6 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
             })
         }
     })
-
-    notifications.subscribe(() => console.log(notifications.get()))
 
     return (
         <window

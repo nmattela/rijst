@@ -7,6 +7,7 @@ import PushNotification from "./widget/PushNotification"
 import { Power } from "./widget/Power"
 import AppLauncher from "./widget/AppLauncher"
 import Desktop from "./widget/Desktop"
+import { playSound } from "./utils/utils"
 
 app.start({
     css: style,
