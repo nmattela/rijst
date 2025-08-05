@@ -70,6 +70,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
     const close = () => {
         setSearch(``)
         setFocusedItem(0)
+        setPage(0)
         app.get_window(`App Launcher`)?.hide()
     }
 
@@ -77,6 +78,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
         apps.get().at(focusedItem.get())?.launch()
         setSearch(``)
         setFocusedItem(0)
+        setPage(0)
         app.toggle_window(`App Launcher`)
     }
 
@@ -137,86 +139,119 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                 focusOnClick
                                 onActivate={launch}
                             >
-                                <Gtk.EventControllerKey
+                                {/* <Gtk.EventControllerKey
                                     onKeyPressed={({ widget }, keyval) => {
                                         if(keyval === Gdk.KEY_Down) {
                                             onNavigate(Gtk.DirectionType.DOWN)
                                         }
                                     }}
-                                />
+                                /> */}
                             </entry>
                         )}
                     </With>
                 </box>
-                <box>
-                    <With value={appsPage}>
-                        {([apps, page, focusedItem]) => (
-                            <Gtk.FlowBox
-                                maxChildrenPerLine={4}
-                                rowSpacing={10}
-                                columnSpacing={10}
-                                focusable
-                                canFocus={inputFocused.as(i => !i)}
-                            >
-                                <Gtk.EventControllerKey
-                                    onKeyPressed={(_, keyval) => {
-                                        const direction = (() => {
-                                            if(keyval === Gdk.KEY_Down) {
-                                                return Gtk.DirectionType.DOWN
-                                            } else if(keyval === Gdk.KEY_Left) {
-                                                return Gtk.DirectionType.LEFT
-                                            } else if(keyval === Gdk.KEY_Up) {
-                                                return Gtk.DirectionType.UP
-                                            } else if(keyval === Gdk.KEY_Right) {
-                                                return Gtk.DirectionType.RIGHT
-                                            } else {
-                                                return undefined
-                                            }
-                                        })()
-
-                                        if(direction !== undefined) {
-                                            onNavigate(direction)
-                                        } else if(keyval === Gdk.KEY_Return) {
-                                            launch()
-                                        }
-                                    }}
+                <box
+                    orientation={Gtk.Orientation.HORIZONTAL}
+                    spacing={10}
+                >
+                    <box>
+                        <With value={page}>
+                            {page => (
+                                <button
+                                    valign={Gtk.Align.CENTER}
+                                    class={`nav-page ${page <= 0 ? `nav-page-disabled` : ``}`}
+                                    iconName={`left-symbolic`}
+                                    cursor={page <= 0 ? undefined : Gdk.Cursor.new_from_name(`pointer`, null)}
+                                    onClicked={page <= 0 ? undefined : () => setPage(page => page-1)}
                                 />
-                                {pad(apps.slice(page*12, (page+1)*12), 12).map((app, i) => (
-                                    <button
-                                        label={app?.name}
-                                        class={app !== undefined ? `app ${focusedItem === (i + 12*page) ? `app-focus` : ``}` : undefined}
-                                        halign={Gtk.Align.CENTER}
-                                        valign={Gtk.Align.CENTER}
-                                        widthRequest={200} 
-                                        heightRequest={115}
-                                        cursor={app !== undefined ? Gdk.Cursor.new_from_name(`pointer`, null) : undefined}
-                                        onClicked={() => app?.launch()}
-                                    >
-                                        {
-                                            app !== undefined && (
-                                                <box
-                                                    orientation={Gtk.Orientation.VERTICAL}
-                                                    spacing={10}
-                                                    valign={Gtk.Align.CENTER}
-                                                    halign={Gtk.Align.CENTER}
-                                                >
-                                                    <image
-                                                        iconName={app.iconName}
-                                                        pixelSize={40}
-                                                    />
-                                                    <label
-                                                        label={app.name}
-                                                        maxWidthChars={15}
-                                                        ellipsize={Pango.EllipsizeMode.END}
-                                                    />
-                                                </box>
-                                            )
-                                        }
-                                    </button>
-                                ))}
-                            </Gtk.FlowBox>
-                        )}
-                    </With>
+                            )}
+                        </With>
+                    </box>
+                    <box>
+                        <With value={appsPage}>
+                            {([apps, page, focusedItem]) => (
+                                <Gtk.FlowBox
+                                    maxChildrenPerLine={4}
+                                    rowSpacing={10}
+                                    columnSpacing={10}
+                                    focusable
+                                    canFocus={inputFocused.as(i => !i)}
+                                    halign={Gtk.Align.CENTER}
+                                >
+                                    <Gtk.EventControllerKey
+                                        onKeyPressed={(_, keyval) => {
+                                            const direction = (() => {
+                                                if(keyval === Gdk.KEY_Down) {
+                                                    return Gtk.DirectionType.DOWN
+                                                } else if(keyval === Gdk.KEY_Left) {
+                                                    return Gtk.DirectionType.LEFT
+                                                } else if(keyval === Gdk.KEY_Up) {
+                                                    return Gtk.DirectionType.UP
+                                                } else if(keyval === Gdk.KEY_Right) {
+                                                    return Gtk.DirectionType.RIGHT
+                                                } else {
+                                                    return undefined
+                                                }
+                                            })()
+
+                                            if(direction !== undefined) {
+                                                onNavigate(direction)
+                                            } else if(keyval === Gdk.KEY_Return) {
+                                                launch()
+                                            }
+                                        }}
+                                    />
+                                    {pad(apps.slice(page*12, (page+1)*12), 12).map((app, i) => (
+                                        <button
+                                            label={app?.name}
+                                            class={app !== undefined ? `app ${focusedItem === (i + 12*page) ? `app-focus` : ``}` : undefined}
+                                            halign={Gtk.Align.CENTER}
+                                            valign={Gtk.Align.CENTER}
+                                            widthRequest={200} 
+                                            heightRequest={115}
+                                            cursor={app !== undefined ? Gdk.Cursor.new_from_name(`pointer`, null) : undefined}
+                                            onClicked={() => app?.launch()}
+                                            tooltipText={app?.name}
+                                        >
+                                            {
+                                                app !== undefined && (
+                                                    <box
+                                                        orientation={Gtk.Orientation.VERTICAL}
+                                                        spacing={10}
+                                                        valign={Gtk.Align.CENTER}
+                                                        halign={Gtk.Align.CENTER}
+                                                    >
+                                                        <image
+                                                            iconName={app.iconName}
+                                                            pixelSize={40}
+                                                        />
+                                                        <label
+                                                            label={app.name}
+                                                            maxWidthChars={10}
+                                                            ellipsize={Pango.EllipsizeMode.END}
+                                                        />
+                                                    </box>
+                                                )
+                                            }
+                                        </button>
+                                    ))}
+                                </Gtk.FlowBox>
+                            )}
+                        </With>
+                    </box>
+                    <box>
+                        <With value={pageTotalPages}>
+                            {([page, totalPages]) => (
+                                <button
+                                    valign={Gtk.Align.CENTER}
+                                    class={`nav-page ${page >= (totalPages-1) ? `nav-page-disabled` : ``}`}
+                                    iconName={`right-symbolic`}
+                                    cursor={page >= (totalPages-1) ? undefined : Gdk.Cursor.new_from_name(`pointer`, null)}
+                                    onClicked={page >= (totalPages-1) ? undefined : () => setPage(page => page+1)}
+                                />
+                            )}
+                        </With>
+                    </box>
                 </box>
                 <box
                     valign={Gtk.Align.CENTER}

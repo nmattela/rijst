@@ -34,11 +34,11 @@ export default function SystemTray() {
         >
             <box>
                 <For each={trayItems}>
-                {trayItem => (
+                    {trayItem => (
                         <TrayIcon
                             item={trayItem}
                         />
-                )} 
+                    )} 
                 </For>
             </box>
             <box><NetworkIcon small /></box>

@@ -512,6 +512,24 @@ window.BarFocused {
             }
         }
 
+        .nav-page {
+            color: white;
+            border-radius: 1000px;
+            background-color: $page-color;
+            padding: 0.5rem;
+        }
+
+        .nav-page:hover {
+            filter: brightness(90%);
+        }
+
+        .nav-page-disabled {
+            background-color: $bg-color;
+        }
+
+        .nav-page-disabled:hover {
+            filter: unset;
+        }
 
         .app {
             padding: 1rem;
