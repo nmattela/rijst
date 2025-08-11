@@ -74,8 +74,8 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
         app.get_window(`App Launcher`)?.hide()
     }
 
-    const launch = () => {
-        apps.get().at(focusedItem.get())?.launch()
+    const launch = (item: number) => {
+        apps.get().at(item)?.launch()
         setSearch(``)
         setFocusedItem(0)
         setPage(0)
@@ -137,7 +137,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                 hexpand
                                 canFocus={inputFocused}
                                 focusOnClick
-                                onActivate={launch}
+                                onActivate={() => launch(focusedItem.get())}
                             >
                                 {/* <Gtk.EventControllerKey
                                     onKeyPressed={({ widget }, keyval) => {
@@ -197,7 +197,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                             if(direction !== undefined) {
                                                 onNavigate(direction)
                                             } else if(keyval === Gdk.KEY_Return) {
-                                                launch()
+                                                launch(focusedItem)
                                             }
                                         }}
                                     />
@@ -210,7 +210,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                             widthRequest={200} 
                                             heightRequest={115}
                                             cursor={app !== undefined ? Gdk.Cursor.new_from_name(`pointer`, null) : undefined}
-                                            onClicked={() => app?.launch()}
+                                            onClicked={() => launch((page * 12) + i)}
                                             tooltipText={app?.name}
                                         >
                                             {

@@ -332,7 +332,7 @@ function TrayIcon({ item }: { item: Tray.TrayItem }) {
             tooltipText={item.title}
             onClicked={() => item.activate(0, 0)}
             label={item.iconName === `` ? item.title.at(0)?.toUpperCase() : undefined}
-            tooltipMarkup={item.tooltipMarkup}
+            tooltipMarkup={item.tooltipMarkup ? item.tooltipMarkup : undefined}
         />
     )
 }

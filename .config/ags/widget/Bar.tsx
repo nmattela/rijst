@@ -12,6 +12,7 @@ import Notifd from "gi://AstalNotifd"
 import Notification from "./Notification"
 import Desktop from "./Desktop"
 import Hyprland from "gi://AstalHyprland"
+import KyaboardLayout from "./KeyboardLayout"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 
@@ -72,6 +73,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
                         $type={"end"}
                         spacing={150}
                     >
+                        <KyaboardLayout />
                         <SystemTray />
                         <PowerButton />
                     </box>
