@@ -58,7 +58,7 @@ export default function Workspaces() {
 function WorkspaceButton({ workspace, index, isWorkspaceFocused, focusedClient, clients, onClick }: { workspace: Hyprland.Workspace | undefined, index: number, isWorkspaceFocused: boolean, focusedClient?: Hyprland.Client, clients: Array<Hyprland.Client>, onClick: () => void }) {
 
     const icons = clients.map<[Hyprland.Client, string]>(client => [client, apps.fuzzy_query(client.class).at(0)?.iconName ?? `dot-symbolic`]) ?? []
-    const currentIcon = icons.filter(([client]) => !client.hidden)
+    const currentIcon = icons.filter(([client]) => !client.hidden).slice(0, 1)
 
     const shownClients: Array<[Hyprland.Client | undefined, string]> = isWorkspaceFocused ? icons : currentIcon
 
