@@ -5,8 +5,8 @@
     :geometry (geometry
                     :x 0
                     :y 0
-                    :width 1920
-                    :height 1026
+                    :width 3440
+                    :height 1440
                     :anchor "center")
     (greeter)
 )
@@ -107,6 +107,20 @@
                         :class "greeter-stats-progress greeter-stats-disk-progress"
                         :width 500
                         :value {round(EWW_DISK["/"].used_perc, 0)}
+                        :orientation "horizontal"
+                    )
+                )
+                (box
+                    :class "greeter-stats-temp"
+                    :orientation "horizontal"
+                    :space-evenly false
+                    :spacing 8
+                    (label :text "")
+                    (label :text "${EWW_TEMPS.AMDGPU_EDGE}°C")
+                    (scale
+                        :class "greeter-stats-progress greeter-stats-temp-progress"
+                        :width 500
+                        :value {EWW_TEMPS.AMDGPU_EDGE}
                         :orientation "horizontal"
                     )
                 )

@@ -5,7 +5,7 @@
     :focusable false
     :stacking "overlay"
     :geometry (geometry
-                    :x 1320
+                    :x 2640
                     :y 15
                     :width 0
                     :height 0)
@@ -128,7 +128,7 @@
                             :orientaton "horizontal"
                             :space-evenly false
                             :spacing 3
-                            (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "amixer set Master toggle" "${audio-volume}")
+                            (button :width 25 :class "system-slider-icon system-volume-slider-icon" :onclick "amixer set Master toggle" "${volume-icon}")
                             (scale :class "system-slider-scale volume-slider"
                                     :value audio-volume
                                     :orientation "h"
@@ -143,7 +143,7 @@
                             :orientation "horizontal"
                             :space-evenly false
                             :spacing 3
-                            (button :width 25 :class "system-slider-icon system-brightness-slider-icon" "${display-brightness.value}")
+                            (button :width 25 :class "system-slider-icon system-brightness-slider-icon" "${display-brightness.icon}")
                             (scale :class "system-slider-scale brightness-slider"
                                     :orientation "h"
                                     :max 100
