@@ -7,7 +7,7 @@ import Battery from "gi://AstalBattery"
 import Apps from "gi://AstalApps"
 import app from "ags/gtk4/app"
 import Tray from "gi://AstalTray"
-import SystemMenu from "./SystemMenu"
+import SystemMenu, { setVisible, visible } from "./SystemMenu"
 import Notification from "./Notification"
 import { execAsync } from "ags/process"
 import Pango from "gi://Pango"
@@ -152,20 +152,25 @@ export function BluetoothIcon({ small = false }: { small?: boolean }) {
                 : isPowered && devices.length > 1
                     ? /*`󰂱`*/`bluetooth-connected-symbolic`
                     : /*`󰂲`*/`bluetooth-off-symbolic`
-    )).get())
+    )).peek())
+    console.log(`bluetoothIcon is: `, bluetoothIcon)
 
     if(small) {
         return (
             <With value={devices}>
                 {devices => (
                     <button
-                        iconName={bluetoothIcon}
+                        // iconName={bluetoothIcon}
                         tooltipText={label}
                         class={`icon bluetooth ${devices.length > 0 ? `bluetooth-enabled` : ``}`}
                         widthRequest={30}
                         onClicked={() => apps.fuzzy_query("bluetooth").at(0)?.launch()}
                         cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
-                    />
+                    >
+                        <image
+                            iconName={`bluetooth-connected-symbolic`}
+                        />
+                    </button>
                 )}
             </With>
         )
@@ -180,7 +185,7 @@ export function BluetoothIcon({ small = false }: { small?: boolean }) {
                         onClick={() => execAsync(`blueberry`)}
                         active={isPowered}
                     />
-                )).get()}
+                )).peek()}
             </With>
         )
     }
@@ -199,7 +204,7 @@ export function AudioIcon({ small = false }: { small?: boolean }) {
     // const label = sequence({ volume: volume ?? new Accessor(() => undefined), muted: muted ?? new Accessor(() => undefined) }).as(({ volume, muted }) => muted ? `Muted` : `${Math.round((volume ?? 0) * 100)}%`)
 
     const name = createBinding(audio.defaultSpeaker, `name`)
-    const tooltipText = (label ?? new Accessor(() => undefined)).as(label => (name ?? new Accessor(() => undefined)).as(name => `${name}${label !== undefined ? `- ${label}` : ``}`).get())
+    const tooltipText = (label ?? new Accessor(() => undefined)).as(label => (name ?? new Accessor(() => undefined)).as(name => `${name}${label !== undefined ? `- ${label}` : ``}`).peek())
 
     const className = muted?.(muted => audio === null || defaultSpeaker === undefined
         ? `icon audio`
@@ -245,7 +250,7 @@ export function MicrophoneIcon({ small = false }: { small?: boolean }) {
     const volumeIcon = audio !== null ? createBinding(audio.defaultMicrophone, `volumeIcon`) : undefined
     const muted = audio !== null ? createBinding(audio.defaultMicrophone, `mute`) : undefined
 
-    const label = volume?.as(volume => muted?.as(muted => muted ? `Muted` : `${Math.round(volume * 100)}%`).get() ?? ``)
+    const label = volume?.as(volume => muted?.as(muted => muted ? `Muted` : `${Math.round(volume * 100)}%`).peek() ?? ``)
 
     const tooltipText = audio === null || defaultMicrophone === undefined
         ? `No microphone found`
@@ -339,28 +344,21 @@ function TrayIcon({ item }: { item: Tray.TrayItem }) {
 
 function ExpandButton() {
 
-    const [open, setOpen] = createState(app.get_window(`System Menu`)?.visible ?? false)
-    app.connect(`window-toggled`, (source, window) => {
-        if(window.name === `System Menu`) {
-            setOpen(window.visible)
-        }
-    })
-
     return (
         <button
-            tooltipText={`Open drawer`}
+            tooltipText={`Toggle drawer`}
             class={`icon hover-fg`}
             widthRequest={30}
             onClicked={() => {
-                app.toggle_window(`System Menu`)
+                setVisible(visible => !visible)
             }}
             cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
         >
             {/*󰍝*/}
-            <With value={open}>
-                {open => (
+            <With value={visible}>
+                {visible => (
                     <image
-                        iconName={open ? `go-up` : `go-down`}
+                        iconName={visible ? `go-up` : `go-down`}
                     />
                 )}
             </With>

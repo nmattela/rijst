@@ -8,10 +8,12 @@ import { Power } from "./widget/Power"
 import AppLauncher from "./widget/AppLauncher"
 import Desktop from "./widget/Desktop"
 import { playSound } from "./utils/utils"
+import System from "system"
+import { Gtk } from "ags/gtk4"
 
 app.start({
     css: style,
-    icons: `${GLib.getenv(`HOME`)}/.config/ags/icons`,
+    icons: `${SRC}/icons`,
     main() {
 
         const monitor = app.get_monitors().find(m => m.connector === `DP-3`)

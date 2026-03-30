@@ -4,6 +4,7 @@ import Notification from "./Notification";
 import { createState, For, With } from "ags";
 import Notifd from "gi://AstalNotifd"
 import { interval, timeout } from "ags/time";
+import { visible } from "./SystemMenu";
 
 export default function PushNotification(gdkmonitor: Gdk.Monitor) {
     const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor
@@ -13,15 +14,15 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
     const [notifications, setNotifications] = createState<Array<{ notification: Notifd.Notification, countdown: number }>>([])
 
     notifd.connect(`notified`, (_, id) =>  {
-        if(!app.get_window(`System Menu`)?.visible) {
+        if(!visible.peek()) {
             const notification = notifd.get_notification(id)
             setNotifications(notifications => [...notifications, { notification, countdown: 5000 }])
             const counter = interval(16, () => {
-                const index = notifications.get().findIndex(({ notification }) => notification.id === id)
+                const index = notifications.peek().findIndex(({ notification }) => notification.id === id)
                 if(index === -1) {
                     counter.cancel()
                 } else {
-                    const { notification, countdown } = notifications.get()[index]
+                    const { notification, countdown } = notifications.peek()[index]
                     if(countdown <= 0) {
                         setNotifications(notifications => [...notifications.slice(0, index), ...notifications.slice(index + 1)])
                         counter.cancel()
@@ -47,6 +48,7 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
             heightRequest={100}
             marginTop={20}
             marginRight={150}
+            resizable={false}
         >
             <box
                 orientation={Gtk.Orientation.VERTICAL}
@@ -64,7 +66,7 @@ export default function PushNotification(gdkmonitor: Gdk.Monitor) {
                             >
                                 <Notification
                                     notification={notification}
-                                    dismiss={() => setNotifications(notifications => [...notifications.slice(0, i.get()), ...notifications.slice(i.get() + 1)])} />
+                                    dismiss={() => setNotifications(notifications => [...notifications.slice(0, i.peek()), ...notifications.slice(i.peek() + 1)])} />
                                 <levelbar
                                     class="countdown"
                                     value={countdown / 5000}

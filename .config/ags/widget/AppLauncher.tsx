@@ -17,13 +17,13 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
 
     const [search, setSearch] = createState(``)
     const [apps, setApps] = createState<Array<Apps.Application>>(appsClient.list)
-    search.subscribe(() => setApps(appsClient.exact_query(search.get())))
+    search.subscribe(() => setApps(appsClient.exact_query(search.peek())))
     const [page, setPage] = createState(0)
     const totalPages = apps.as(apps => Math.ceil(apps.length / 12))
     const [inputFocused, setInputFocused] = createState(true)
     const [focusedItem, setFocusedItem] = createState<number>(0)
     
-    focusedItem.subscribe(() => setPage(Math.floor((focusedItem.get() ?? 0) / 12)))
+    focusedItem.subscribe(() => setPage(Math.floor((focusedItem.peek() ?? 0) / 12)))
     search.subscribe(() => setFocusedItem(0))
 
     const appsPage = createComputed([apps, page, focusedItem])
@@ -57,11 +57,11 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
             })()
     
             if(newI < 0) {
-                return [apps.get().length + newI, newInputFocused]
+                return [apps.peek().length + newI, newInputFocused]
             } else {
-                return [newI % apps.get().length, newInputFocused]
+                return [newI % apps.peek().length, newInputFocused]
             }
-        })(focusedItem.get())
+        })(focusedItem.peek())
 
         setFocusedItem(newFocusedItem)
         setInputFocused(newInputFocused)
@@ -75,7 +75,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
     }
 
     const launch = (item: number) => {
-        apps.get().at(item)?.launch()
+        apps.peek().at(item)?.launch()
         setSearch(``)
         setFocusedItem(0)
         setPage(0)
@@ -137,7 +137,7 @@ export default function AppLauncher(gdkmonitor: Gdk.Monitor) {
                                 hexpand
                                 canFocus={inputFocused}
                                 focusOnClick
-                                onActivate={() => launch(focusedItem.get())}
+                                onActivate={() => launch(focusedItem.peek())}
                             >
                                 {/* <Gtk.EventControllerKey
                                     onKeyPressed={({ widget }, keyval) => {

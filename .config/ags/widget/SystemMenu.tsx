@@ -14,14 +14,19 @@ import GLib from "gi://GLib"
 import MediaPlayer from "./MediaPlayer"
 import WeatherView from "./WeatherView"
 
+export const [visible, setVisible] = createState(false)
+
 export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
     const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor
 
+    const [windowVisible, setWindowVisible] = createState(visible.peek())
     const brightness = Brightness.get_default()
 
-    const [visible, setVisible] = createState(false)
-    app.connect(`window-toggled`, (_, window) => {
-        window.name === `System Menu` ? setVisible(window.visible) : null
+    visible.subscribe(() => {
+        console.log(`called: `, visible.peek())
+        if(visible.peek()) {
+            setWindowVisible(true)
+        }
     })
 
     return (
@@ -37,6 +42,7 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
             marginTop={20}
             marginRight={100}
             transientFor={app.get_window(`Bar`) ?? undefined}
+            visible={windowVisible}
             // onButtonPressEvent={(window, event) => {
             //     console.log(`slorp`, event)
             //     if(event.button === Gdk.KEY_Escape) {
@@ -60,6 +66,11 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
             <revealer
                 revealChild={visible}
                 transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
+                onNotifyChildRevealed={(source, pspec) => {
+                    if(!source.childRevealed) {
+                        setWindowVisible(false)
+                    }
+                }}
             >
                 <box
                     orientation={Gtk.Orientation.HORIZONTAL}
@@ -107,7 +118,7 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                                         tooltipText={`Screenshot`}
                                         iconName={`screenshot-symbolic`}
                                         onClicked={() => {
-                                            app.get_window(`System Menu`)?.hide()
+                                            setVisible(false)
                                             execAsync([`grimblast`, `copy`, `area`])
                                         }}
                                         cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
@@ -117,7 +128,7 @@ export default function SystemMenu(gdkmonitor: Gdk.Monitor) {
                                         tooltipText={`Color Picker`}
                                         iconName={`color-picker-symbolic`}
                                         onClicked={async () => {
-                                            app.get_window(`System Menu`)?.hide()
+                                            setVisible(false)
                                             execAsync([`${GLib.getenv(`HOME`)}/.scripts/color-picker`])
                                         }}
                                         cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
@@ -269,7 +280,7 @@ function AudioDeviceSlider({ type }: { type: `audio` | `mic` }) {
                     cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
                     tooltipText={audioLabel}
                     onClicked={() => {
-                        currentSpeaker.get().set_mute(!muted.get())
+                        currentSpeaker.peek().set_mute(!muted.peek())
                     }}
                 >
                     <image iconName={volumeIcon} />
@@ -280,7 +291,7 @@ function AudioDeviceSlider({ type }: { type: `audio` | `mic` }) {
                     min={0}
                     max={1}
                     onChangeValue={({ value }) => {
-                        currentSpeaker.get().set_volume(value)
+                        currentSpeaker.peek().set_volume(value)
                     }}
                     visible={true}
                     hexpand
@@ -321,7 +332,7 @@ function Notifications() {
                     class="clear-button"
                     label={`Clear All`}
                     onClicked={() => {
-                        notifications.get().forEach(notification => notification.dismiss())
+                        notifications.peek().forEach(notification => notification.dismiss())
                         setNotifications([])
                     }}
                     visible={notifications.as(notifications => notifications.length !== 0)}

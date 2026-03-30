@@ -440,6 +440,13 @@ window.BarFocused {
     background-color: $bg-color;
 
     .header {
+        .title {
+            margin-right: 1rem;
+            padding: 0.5rem;
+            background-color: $fg-color;
+            border-radius: 10px;
+        }
+
         .summary {
             font-style: italic;
         }

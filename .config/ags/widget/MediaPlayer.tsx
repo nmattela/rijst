@@ -12,18 +12,18 @@ export default function MediaPlayer() {
 
     const players = createPoll([], 500, () => mpris.players) //createBinding(mpris, `players`)
     const [currentPlayerIndex, setCurrentPlayerIndex] = createState<number | undefined>(undefined)
-    const [currentPlayer, setCurrentPlayer] = createState(players.get().at(0))
+    const [currentPlayer, setCurrentPlayer] = createState(players.peek().at(0))
     // const currentPlayer = players.as(players => players.find(player => player.playbackStatus === Mpris.PlaybackStatus.PLAYING) ?? players.at(0))
 
     players.subscribe(() => {
-        if(currentPlayerIndex.get() === undefined) {
-            setCurrentPlayer(players.get().find(player => player.playbackStatus === Mpris.PlaybackStatus.PLAYING) ?? players.get().at(0))
+        if(currentPlayerIndex.peek() === undefined) {
+            setCurrentPlayer(players.peek().find(player => player.playbackStatus === Mpris.PlaybackStatus.PLAYING) ?? players.peek().at(0))
         }
     })
 
     currentPlayerIndex.subscribe(() => {
-        if(currentPlayerIndex.get() !== undefined) {
-            setCurrentPlayer(currentPlayer => players.get().at(currentPlayerIndex.get()!) ?? currentPlayer)
+        if(currentPlayerIndex.peek() !== undefined) {
+            setCurrentPlayer(currentPlayer => players.peek().at(currentPlayerIndex.peek()!) ?? currentPlayer)
         }
     })
 

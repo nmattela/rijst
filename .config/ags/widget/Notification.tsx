@@ -9,6 +9,7 @@ export default function Notification({ notification, dismiss }: { notification: 
         <box
             class="notification"
             heightRequest={100}
+            widthRequest={350}
             orientation={Gtk.Orientation.VERTICAL}
             spacing={10}
         >
@@ -18,18 +19,26 @@ export default function Notification({ notification, dismiss }: { notification: 
                 hexpand
             >
                 <box
+                    class="title"
                     $type="start"
-                    spacing={10}
+                    hexpand
                 >
-                    <image
-                        iconName={notification.appIcon ? notification.appIcon : `bell-notification-symbolic`}
-                    />
-                    <label
-                        maxWidthChars={60}
-                        label={notification.summary}
-                        class="summary"
-                        ellipsize={Pango.EllipsizeMode.END}
-                    />
+                    <box
+                        spacing={10}
+                    >
+                        <image
+                            
+                            iconName={notification.appIcon ? notification.appIcon : `bell-notification-symbolic`}
+                        />
+                        <label
+                            widthChars={15}
+                            // maxWidthChars={15}
+                            lines={1}
+                            label={notification.summary}
+                            class="summary"
+                            ellipsize={Pango.EllipsizeMode.END}
+                        />
+                    </box>
                 </box>
                 <box
                     $type="end"

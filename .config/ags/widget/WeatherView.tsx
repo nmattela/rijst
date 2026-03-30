@@ -45,7 +45,7 @@ export default function WeatherView({ shade }: { shade?: boolean }) {
                             $type="end"
                             class="copyright"
                             label={copyright}
-                            onClicked={() => execAsync([`xdg-open`, source.get()])}
+                            onClicked={() => execAsync([`xdg-open`, source.peek()])}
                             cursor={Gdk.Cursor.new_from_name(`pointer`, null)}
                         />
                     </centerbox>
