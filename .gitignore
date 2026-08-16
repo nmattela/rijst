@@ -3,3 +3,4 @@
 **/fish_variables*
 .config/hypr/hypr.d/monitors.conf
 **/fish/conf.d
+.config/caelestia/monitors
